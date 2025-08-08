@@ -299,6 +299,6 @@ Have a great Belay.NET project? We'd love to include it! See our [Contributing G
 
 ## Need Help?
 
-- **[GitHub Discussions](https://github.com/belay-dotnet/belay/discussions)** - Ask questions about examples
-- **[Issue Tracker](https://github.com/belay-dotnet/belay/issues)** - Report problems with examples
+- **[GitHub Discussions](https://github.com/belay-dotnet/Belay.NET/discussions)** - Ask questions about examples
+- **[Issue Tracker](https://github.com/belay-dotnet/Belay.NET/issues)** - Report problems with examples
 - **[Stack Overflow](https://stackoverflow.com/questions/tagged/belay.net)** - Get help from the community

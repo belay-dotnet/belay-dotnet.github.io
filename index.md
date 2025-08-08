@@ -6,7 +6,7 @@ hero:
   text: "Control MicroPython devices from .NET"
   tagline: Write C# code that seamlessly executes on microcontrollers, with full IntelliSense, type safety, and async/await support.
   image:
-    src: /hero-logo.svg
+    src: /logo.svg
     alt: Belay.NET
   actions:
     - theme: brand
@@ -14,7 +14,7 @@ hero:
       link: /guide/getting-started
     - theme: alt
       text: View on GitHub
-      link: https://github.com/belay-dotnet/belay
+      link: https://github.com/belay-dotnet/Belay.NET
 
 features:
   - icon: 🚀

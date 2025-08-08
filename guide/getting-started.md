@@ -200,8 +200,8 @@ Now that you have Belay.NET working, explore these topics:
 
 ## Getting Help
 
-- **[GitHub Discussions](https://github.com/belay-dotnet/belay/discussions)** - Ask questions
-- **[Issue Tracker](https://github.com/belay-dotnet/belay/issues)** - Report bugs
+- **[GitHub Discussions](https://github.com/belay-dotnet/Belay.NET/discussions)** - Ask questions
+- **[Issue Tracker](https://github.com/belay-dotnet/Belay.NET/issues)** - Report bugs
 - **[Stack Overflow](https://stackoverflow.com/questions/tagged/belay.net)** - Community help
 
 Welcome to the world of seamless .NET to MicroPython integration! 🚀
