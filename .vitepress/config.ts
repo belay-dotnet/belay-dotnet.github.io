@@ -18,7 +18,12 @@ export default defineConfig({
   ],
 
   themeConfig: {
-    logo: { src: '/logo.svg', width: 32, height: 32 },
+    logo: { 
+      light: '/logo.svg', 
+      dark: '/logo-dark.svg',
+      width: 32, 
+      height: 32 
+    },
     siteTitle: 'Belay.NET',
     
     nav: [
@@ -130,9 +135,6 @@ export default defineConfig({
     search: {
       provider: 'local'
     },
-    
-    // Ignore dead links during build
-    ignoreDeadLinks: true
   },
 
   markdown: {
@@ -142,6 +144,4 @@ export default defineConfig({
     }
   },
 
-  // Ignore dead links during build
-  ignoreDeadLinks: true
 })
