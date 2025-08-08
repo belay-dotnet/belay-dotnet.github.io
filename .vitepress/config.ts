@@ -18,7 +18,8 @@ export default defineConfig({
   ],
 
   themeConfig: {
-    logo: { src: '/logo.svg', width: 24, height: 24 },
+    logo: { src: '/logo.svg', width: 32, height: 32 },
+    siteTitle: 'Belay.NET',
     
     nav: [
       { text: 'Guide', link: '/guide/getting-started' },
@@ -122,7 +123,7 @@ export default defineConfig({
     },
 
     editLink: {
-      pattern: 'https://github.com/belay-dotnet/belay/edit/main/docs/:path',
+      pattern: 'https://github.com/belay-dotnet/belay-dotnet.github.io/edit/main/:path',
       text: 'Edit this page on GitHub'
     },
 

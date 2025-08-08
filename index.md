@@ -3,8 +3,8 @@ layout: home
 
 hero:
   name: "Belay.NET"
-  text: "Bridge .NET and MicroPython Seamlessly"
-  tagline: The enterprise-ready library that transforms IoT development—write C# code that executes directly on microcontrollers with zero friction.
+  text: "Connect C# Applications to Hardware Instantly"  
+  tagline: A .NET library that lets your desktop applications communicate with MicroPython devices as easily as calling a method. No embedded programming knowledge required.
   image:
     src: /logo.svg
     alt: Belay.NET
@@ -42,43 +42,35 @@ features:
     details: Health checks, performance metrics, and comprehensive error handling with structured logging.
 ---
 
-## Who Is This For?
+## What Is Belay.NET?
 
-<div class="audience-grid">
-  <div class="audience-card">
-    <div class="audience-icon">👩‍💻</div>
-    <h3>.NET Developers</h3>
-    <p>Leverage your existing C# skills to control hardware without learning embedded programming languages. Stay in your IDE with full IntelliSense and debugging support.</p>
-  </div>
-  
-  <div class="audience-card">
-    <div class="audience-icon">🏭</div>
-    <h3>Enterprise Teams</h3>
-    <p>Build scalable IoT solutions with enterprise features like dependency injection, health monitoring, and structured logging. Deploy with confidence using familiar .NET deployment patterns.</p>
-  </div>
-  
-  <div class="audience-card">
-    <div class="audience-icon">🎓</div>
-    <h3>Educators & Students</h3>
-    <p>Teach IoT concepts using familiar .NET tools and patterns. Focus on problem-solving instead of wrestling with low-level hardware programming.</p>
-  </div>
-  
-  <div class="audience-card">
-    <div class="audience-icon">🔬</div>
-    <h3>Researchers</h3>
-    <p>Rapidly prototype and iterate on hardware experiments. Write maintainable, testable code for research instruments and data collection systems.</p>
-  </div>
-</div>
+**Belay.NET is a .NET library that bridges the gap between your C# desktop applications and MicroPython hardware.** Think of it as a communication layer that lets you treat microcontrollers like remote objects in your application.
+
+Instead of learning embedded programming, writing firmware, or dealing with serial communication protocols, you simply:
+- Install the NuGet package  
+- Connect your MicroPython device via USB
+- Write C# methods that execute Python code on the device
+- Get strongly-typed results back in your application
+
+It's designed for **C# developers who need to connect to hardware quickly** without becoming embedded systems experts.
 
 ## The Problem We Solve
 
-**Traditional IoT development is fragmented.** You write C# for your backend, Python for your devices, JavaScript for your frontend. Context switching between languages slows development and increases bugs.
+**Connecting C# desktop applications to hardware is unnecessarily complex.** Traditional approaches require:
 
-**Belay.NET unifies your stack.** Write everything in C#:
-- 🎯 **One Language**: Use C# across your entire IoT application
-- 🛡️ **Type Safety**: Catch errors at compile-time, not runtime  
-- 🚀 **Familiar Tools**: Use Visual Studio, debugging, and NuGet packages
-- 📈 **Enterprise Ready**: Built-in monitoring, health checks, and dependency injection
+❌ Learning embedded programming languages  
+❌ Writing and deploying firmware  
+❌ Managing serial communication protocols  
+❌ Handling device state and error conditions  
+❌ Converting between data formats manually  
+
+**Belay.NET eliminates this complexity:**
+
+✅ **No firmware needed** - Works with standard MicroPython  
+✅ **No serial protocols** - Handled automatically  
+✅ **No embedded knowledge** - Write familiar C# code  
+✅ **Type safety** - Get compile-time checking and IntelliSense  
+✅ **Error handling** - Comprehensive exception management
 
 ## How It Works
 
@@ -219,45 +211,6 @@ Console.WriteLine($"Current temperature: {temperature}°C");
 [Read the full changelog →](/changelog)
 
 <style>
-/* Audience Grid */
-.audience-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 2rem;
-  margin: 3rem 0;
-}
-
-.audience-card {
-  text-align: center;
-  padding: 2rem;
-  border-radius: 12px;
-  background: var(--vp-c-bg-soft);
-  border: 1px solid var(--vp-c-border);
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.audience-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-}
-
-.audience-icon {
-  font-size: 3rem;
-  margin-bottom: 1rem;
-}
-
-.audience-card h3 {
-  margin: 0 0 1rem 0;
-  color: var(--vp-c-brand-1);
-  font-size: 1.25rem;
-}
-
-.audience-card p {
-  margin: 0;
-  color: var(--vp-c-text-2);
-  line-height: 1.6;
-}
-
 /* How It Works Steps */
 .how-it-works {
   display: grid;
@@ -374,18 +327,9 @@ Console.WriteLine($"Current temperature: {temperature}°C");
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
-  .audience-grid {
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
-  }
-  
   .how-it-works {
     grid-template-columns: 1fr;
     gap: 1.5rem;
-  }
-  
-  .audience-card {
-    padding: 1.5rem;
   }
 }
 </style>
