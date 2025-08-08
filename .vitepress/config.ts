@@ -112,7 +112,7 @@ export default defineConfig({
     },
 
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/belay-dotnet/belay' }
+      { icon: 'github', link: 'https://github.com/belay-dotnet/Belay.NET' }
     ],
 
     footer: {

@@ -1,0 +1,7 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="32" height="32" rx="6" fill="#646cff"/>
+  <path d="M8 12h16v8H8z" fill="white"/>
+  <path d="M10 10h12v12H10z" fill="none" stroke="white" stroke-width="2"/>
+  <circle cx="16" cy="16" r="2" fill="#646cff"/>
+  <text x="16" y="28" text-anchor="middle" fill="#646cff" font-size="8" font-family="monospace">B.NET</text>
+</svg>
