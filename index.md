@@ -16,30 +16,6 @@ hero:
       text: View on GitHub
       link: https://github.com/belay-dotnet/Belay.NET
 
-features:
-  - icon: 🚀
-    title: Zero Configuration
-    details: Connect and control devices in seconds with automatic device detection and protocol negotiation.
-  
-  - icon: 🎯
-    title: Type-Safe Remote Execution
-    details: Full IntelliSense and compile-time safety for remote code with strongly-typed return values.
-    
-  - icon: ⚡
-    title: Async First
-    details: Modern async/await patterns throughout the API with proper cancellation token support.
-    
-  - icon: 🏷️
-    title: Attribute-Based Programming
-    details: Decorate methods to run seamlessly on devices with [Task], [Setup], [Teardown], and [Thread] attributes.
-    
-  - icon: 📦
-    title: Dependency Injection Ready
-    details: First-class DI support with Microsoft.Extensions including configuration, health checks, and factory patterns.
-    
-  - icon: 🔍
-    title: Built-in Monitoring
-    details: Health checks, performance metrics, and comprehensive error handling with structured logging.
 ---
 
 ## What Is Belay.NET?
@@ -53,6 +29,15 @@ Instead of learning embedded programming, writing firmware, or dealing with seri
 - Get strongly-typed results back in your application
 
 It's designed for **C# developers who need to connect to hardware quickly** without becoming embedded systems experts.
+
+## Key Features
+
+- 🚀 **Zero Configuration**: Connect and control devices in seconds with automatic device detection and protocol negotiation.
+- 🎯 **Type-Safe Remote Execution**: Full IntelliSense and compile-time safety for remote code with strongly-typed return values.
+- ⚡ **Async First**: Modern async/await patterns throughout the API with proper cancellation token support.
+- 🏷️ **Attribute-Based Programming**: Decorate methods to run seamlessly on devices with [Task], [Setup], [Teardown], and [Thread] attributes.
+- 📦 **Dependency Injection Ready**: First-class DI support with Microsoft.Extensions including configuration, health checks, and factory patterns.
+- 🔍 **Built-in Monitoring**: Health checks, performance metrics, and comprehensive error handling with structured logging.
 
 ## The Problem We Solve
 
