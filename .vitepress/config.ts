@@ -118,7 +118,7 @@ export default defineConfig({
     ],
 
     footer: {
-      message: 'Released under the MIT License.',
+      message: 'Released under the Apache License 2.0.',
       copyright: 'Copyright © 2025 Belay.NET Contributors'
     },
 

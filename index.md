@@ -6,7 +6,7 @@ hero:
   text: "Connect C# Applications to Hardware Instantly"  
   tagline: A .NET library that lets your desktop applications communicate with MicroPython devices as easily as calling a method. No embedded programming knowledge required.
   image:
-    src: /logo.svg
+    src: /logo-dark.svg
     alt: Belay.NET
   actions:
     - theme: brand
