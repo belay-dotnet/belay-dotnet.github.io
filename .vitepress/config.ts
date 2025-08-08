@@ -7,6 +7,7 @@ export default defineConfig({
   
   head: [
     ['link', { rel: 'icon', type: 'image/svg+xml', href: '/logo.svg' }],
+    ['link', { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }],
     ['meta', { name: 'theme-color', content: '#646cff' }],
     ['meta', { property: 'og:title', content: 'Belay.NET' }],
     ['meta', { property: 'og:description', content: 'Control MicroPython devices from .NET with zero friction' }],
