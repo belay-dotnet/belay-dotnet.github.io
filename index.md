@@ -110,10 +110,6 @@ var temperature = await sensor.ReadTemperatureAsync();
 Console.WriteLine($"Current temperature: {temperature}°C");
 ```
 
-::: tip Real-World Impact
-"Belay.NET cut our IoT prototype development time by 60%. Our team can now use the same C# patterns for both cloud services and hardware control." - **Enterprise Customer**
-:::
-
 ## Production-Ready Features
 
 ### For Individual Developers
