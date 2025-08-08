@@ -353,6 +353,59 @@ Console.WriteLine($"Version: {deviceInfo.version}");
 Console.WriteLine($"Free Memory: {deviceInfo.memory_free}");
 ```
 
+## Attribute-Based Programming Preview
+
+Belay.NET also supports a powerful attribute-based programming model that makes device interaction even easier:
+
+```csharp
+using Belay.Core;
+using Belay.Attributes;
+
+public static class DeviceOperations
+{
+    [Task]
+    public static string GetSystemInfo()
+    {
+        return """
+            import sys, gc
+            f"Platform: {sys.platform}, Memory: {gc.mem_free()} bytes"
+        """;
+    }
+    
+    [Task(Cache = true, TimeoutMs = 5000)]
+    public static int ReadTemperature(int sensorPin)
+    {
+        return $"""
+            from machine import ADC
+            adc = ADC({sensorPin})
+            # Convert raw ADC to temperature (example formula)
+            raw_value = adc.read_u16()
+            temperature = (raw_value * 3.3 / 65536 - 0.5) * 100
+            int(temperature)
+        """;
+    }
+}
+
+// Usage
+using var device = await Device.ConnectAsync("COM3");
+
+// Execute attributed methods directly on the device
+var info = await device.ExecuteMethodAsync<string>(
+    typeof(DeviceOperations).GetMethod(nameof(DeviceOperations.GetSystemInfo))!);
+Console.WriteLine(info);
+
+var temp = await device.ExecuteMethodAsync<int>(
+    typeof(DeviceOperations).GetMethod(nameof(DeviceOperations.ReadTemperature))!, 
+    null, new object[] { 26 });
+Console.WriteLine($"Temperature: {temp}°C");
+```
+
+This approach provides:
+- **Automatic caching** for expensive operations
+- **Timeout protection** for long-running methods  
+- **Type-safe parameter marshaling** from .NET to Python
+- **Structured code organization** with reusable methods
+
 ## Next Steps
 
 Now that you have basic communication working, explore these tutorials:

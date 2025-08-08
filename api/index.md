@@ -11,11 +11,19 @@ Core device communication and management functionality.
 - **IDeviceCommunication** - Interface for device communication protocols
 - **DeviceExecutionException** - Exception handling for device errors
 
+#### Execution Framework
+- **BaseExecutor** - Base class for method execution with attribute-specific policies
+- **TaskExecutor** - Handles [Task] attribute methods with caching, timeout, and exclusive execution
+- **SetupExecutor** - Handles [Setup] attribute methods for device initialization
+- **ThreadExecutor** - Handles [Thread] attribute methods for background execution
+- **TeardownExecutor** - Handles [Teardown] attribute methods for cleanup
+
 ### Belay.Attributes
 Decorative attributes for method execution on MicroPython devices.
 
-- **TaskAttribute** - Execute methods as tasks on the device
+- **TaskAttribute** - Execute methods as tasks on the device with caching, timeout, and exclusive execution options
 - **SetupAttribute** - Mark setup methods for device initialization  
+- **ThreadAttribute** - Mark methods for background thread execution on the device
 - **TeardownAttribute** - Mark cleanup methods for device teardown
 
 ### Belay.Extensions
