@@ -1,0 +1,6 @@
+- name: Raw REPL Protocol Deep Dive
+  href: raw-repl-protocol.md
+- name: Raw-Paste Mode and Flow Control
+  href: raw-paste-mode.md
+- name: Adaptive Protocol Detection
+  href: protocol-detection.md

@@ -1,11 +1,18 @@
-- name: Getting Started
-  href: articles/getting-started.md
-- name: Device Programming
-  href: articles/device-programming.md
-- name: Attributes Reference  
-  href: articles/attributes-reference.md
-- name: Hardware Testing
-  href: articles/hardware-testing.md
+- name: Guide
+  href: guide/
+  homepage: guide/getting-started.md
+- name: Examples
+  href: examples/
+  homepage: examples/index.md
+- name: Hardware
+  href: hardware/
+  homepage: hardware/index.md
+- name: Technical Reference
+  href: technical/
+  homepage: technical/index.md
+- name: Articles
+  href: articles/
+  homepage: articles/getting-started.md
 - name: API Reference
   href: api/
   homepage: api/index.md

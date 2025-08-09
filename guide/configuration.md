@@ -54,6 +54,22 @@ public void ConfigureServices(IServiceCollection services)
         config.Session.IdleTimeoutMs = 60000;     // 1 minute
         config.Session.CleanupIntervalMs = 30000; // 30 seconds
 
+        // Adaptive REPL protocol configuration
+        config.Protocol.RawRepl.EnableAdaptiveTiming = true;
+        config.Protocol.RawRepl.EnableAdaptiveFlowControl = true;
+        config.Protocol.RawRepl.EnableRawPasteAutoDetection = true;
+        config.Protocol.RawRepl.BaseResponseTimeoutMs = 2000;
+        config.Protocol.RawRepl.MaxResponseTimeoutMs = 30000;
+        config.Protocol.RawRepl.StartupDelayMs = 2000;
+        config.Protocol.RawRepl.MaxStartupDelayMs = 10000;
+        config.Protocol.RawRepl.InterruptDelayMs = 100;
+        config.Protocol.RawRepl.MaxRetryAttempts = 3;
+        config.Protocol.RawRepl.RetryDelayMs = 100;
+        config.Protocol.RawRepl.MinimumWindowSize = 16;
+        config.Protocol.RawRepl.MaximumWindowSize = 2048;
+        config.Protocol.RawRepl.PreferredWindowSize = null; // Auto-detect
+        config.Protocol.RawRepl.EnableVerboseLogging = false;
+
         // Health check settings
         config.HealthChecks.Enabled = true;
         config.HealthChecks.CheckIntervalMs = 30000;
@@ -120,6 +136,24 @@ public void Configure(IConfiguration configuration)
       "CacheEnabled": true,
       "CacheDefaultDurationMs": 30000
     },
+    "Protocol": {
+      "RawRepl": {
+        "EnableAdaptiveTiming": true,
+        "EnableAdaptiveFlowControl": true,
+        "EnableRawPasteAutoDetection": true,
+        "BaseResponseTimeoutMs": 2000,
+        "MaxResponseTimeoutMs": 30000,
+        "StartupDelayMs": 2000,
+        "MaxStartupDelayMs": 10000,
+        "InterruptDelayMs": 100,
+        "MaxRetryAttempts": 3,
+        "RetryDelayMs": 100,
+        "MinimumWindowSize": 16,
+        "MaximumWindowSize": 2048,
+        "PreferredWindowSize": null,
+        "EnableVerboseLogging": false
+      }
+    },
     "HealthChecks": {
       "Enabled": true,
       "CheckIntervalMs": 30000,
@@ -148,6 +182,115 @@ public void Configure(IConfiguration configuration)
 - Subprocess communication for hardware-independent testing
 - Fast timeouts for quick test execution
 - Detailed logging for test diagnostics
+
+## Adaptive REPL Protocol Configuration
+
+The adaptive REPL protocol system automatically detects MicroPython device capabilities and adjusts communication parameters for optimal compatibility and performance. These settings control the auto-detection and fallback behavior.
+
+### Core Adaptive Features
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `EnableAdaptiveTiming` | `true` | Automatically adjusts timeouts based on measured device performance |
+| `EnableAdaptiveFlowControl` | `true` | Dynamically optimizes flow control parameters for raw-paste mode |
+| `EnableRawPasteAutoDetection` | `true` | Tests and enables raw-paste mode if supported by the device |
+
+### Timeout Configuration
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `BaseResponseTimeoutMs` | `2000` | Initial timeout for device responses (auto-adjusted based on performance) |
+| `MaxResponseTimeoutMs` | `30000` | Maximum timeout after adaptive increases |
+| `StartupDelayMs` | `2000` | Initial delay for device startup (increased if device needs more time) |
+| `MaxStartupDelayMs` | `10000` | Maximum startup delay after adaptive increases |
+| `InterruptDelayMs` | `100` | Delay after sending interrupt sequences (increased for slow devices) |
+
+### Retry and Recovery Configuration
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `MaxRetryAttempts` | `3` | Number of retry attempts for failed operations |
+| `RetryDelayMs` | `100` | Base delay between retry attempts (uses exponential backoff) |
+
+### Flow Control Configuration
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `MinimumWindowSize` | `16` | Smallest acceptable window size during negotiation |
+| `MaximumWindowSize` | `2048` | Largest window size to request during negotiation |
+| `PreferredWindowSize` | `null` | Fixed window size (null = auto-detect optimal size) |
+
+### Debugging Configuration
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `EnableVerboseLogging` | `false` | Enables detailed protocol logging for troubleshooting |
+
+### Fallback Configuration Example
+
+When auto-detection fails or for problematic devices, use conservative settings:
+
+```csharp
+services.AddBelay(config =>
+{
+    // Disable adaptive features for manual control
+    config.Protocol.RawRepl.EnableAdaptiveTiming = false;
+    config.Protocol.RawRepl.EnableAdaptiveFlowControl = false;
+    config.Protocol.RawRepl.EnableRawPasteAutoDetection = false;
+    
+    // Use conservative manual settings
+    config.Protocol.RawRepl.BaseResponseTimeoutMs = 5000;
+    config.Protocol.RawRepl.StartupDelayMs = 5000;
+    config.Protocol.RawRepl.InterruptDelayMs = 500;
+    config.Protocol.RawRepl.PreferredWindowSize = 32;
+    config.Protocol.RawRepl.MaxRetryAttempts = 5;
+    config.Protocol.RawRepl.RetryDelayMs = 500;
+    
+    // Enable verbose logging for troubleshooting
+    config.Protocol.RawRepl.EnableVerboseLogging = true;
+});
+```
+
+### Device-Specific Recommendations
+
+#### ESP32/ESP8266 Devices
+```json
+{
+  "Protocol": {
+    "RawRepl": {
+      "StartupDelayMs": 3000,
+      "InterruptDelayMs": 200,
+      "PreferredWindowSize": 64
+    }
+  }
+}
+```
+
+#### Raspberry Pi Pico
+```json
+{
+  "Protocol": {
+    "RawRepl": {
+      "StartupDelayMs": 1500,
+      "InterruptDelayMs": 50,
+      "PreferredWindowSize": 128
+    }
+  }
+}
+```
+
+#### CircuitPython Devices
+```json
+{
+  "Protocol": {
+    "RawRepl": {
+      "EnableRawPasteAutoDetection": false,
+      "StartupDelayMs": 2500,
+      "InterruptDelayMs": 300
+    }
+  }
+}
+```
 
 ## Related Documentation
 

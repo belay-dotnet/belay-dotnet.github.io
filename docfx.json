@@ -31,6 +31,14 @@
         "files": [
           "articles/**/*.md",
           "articles/**/*.yml",
+          "guide/**/*.md",
+          "guide/**/*.yml",
+          "examples/**/*.md",
+          "examples/**/*.yml",
+          "hardware/**/*.md",
+          "hardware/**/*.yml",
+          "technical/**/*.md",
+          "technical/**/*.yml",
           "toc.yml",
           "*.md"
         ]
