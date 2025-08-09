@@ -450,4 +450,4 @@ public async Task<string> ExecuteLargeCodeAsync(string pythonCode)
 **Next Steps:**
 - [Raw-Paste Mode Details](/technical/protocols/raw-paste-mode)
 - [Session Management Architecture](/technical/architecture/session-management)
-- [Device-Specific Variations](/technical/micropython/device-variations)
+- Device-Specific Variations *(documentation coming soon)*

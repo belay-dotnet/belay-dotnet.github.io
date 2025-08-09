@@ -631,7 +631,7 @@ public async Task DetectionPerformance_ShouldCompleteWithinTimeLimit()
 - [Raw REPL Protocol Deep Dive](/technical/protocols/raw-repl-protocol) - Protocol fundamentals
 - [Raw-Paste Mode and Flow Control](/technical/protocols/raw-paste-mode) - Advanced flow control
 - [Configuration Guide](/guide/configuration#adaptive-repl-protocol-configuration) - Configuration options
-- [Device-Specific Variations](/technical/micropython/device-variations) - Platform differences
+- Device-Specific Variations - Platform differences *(documentation coming soon)*
 
 ## Best Practices
 

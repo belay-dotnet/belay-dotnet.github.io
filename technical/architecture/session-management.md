@@ -687,7 +687,7 @@ catch (ResourceCleanupException ex)
 
 ## Related Documentation
 
-- [Executor Framework Internals](/technical/architecture/executor-framework) - How executors integrate with sessions
+- Executor Framework Internals - How executors integrate with sessions *(documentation coming soon)*
 - [Raw REPL Protocol Deep Dive](/technical/protocols/raw-repl-protocol) - Protocol capability detection
 - [Configuration Guide](/guide/configuration#session-management) - Session configuration options
 - [Dependency Injection Guide](/guide/dependency-injection) - DI container integration

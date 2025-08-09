@@ -22,18 +22,21 @@ Deep dive into Belay.NET's internal architecture and design patterns.
 ### [Session Management Architecture](/technical/architecture/session-management)
 Complete documentation of the DeviceSessionManager system, lifecycle management, and resource tracking.
 
-### [Executor Framework Internals](/technical/architecture/executor-framework)  
+### Executor Framework Internals
 Method interception, code deployment, caching strategies, and custom executor development.
+*Documentation coming soon.*
 
 ## MicroPython Reference
 
 Essential MicroPython knowledge for .NET developers working with embedded devices.
 
-### [MicroPython Internals for .NET Developers](/technical/micropython/internals)
+### MicroPython Internals for .NET Developers  
 Memory model, garbage collection, threading constraints, and optimization strategies.
+*Documentation coming soon.*
 
-### [Device-Specific Protocol Variations](/technical/micropython/device-variations)
+### Device-Specific Protocol Variations
 Detailed comparison of protocol behavior across ESP32, STM32, RP2040, and other MicroPython platforms.
+*Documentation coming soon.*
 
 ## Who Should Use This Section
 
