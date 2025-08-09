@@ -1,40 +1,69 @@
 # Device Programming Guide
 
-::: warning Documentation in Progress
-This documentation is currently being developed. The core device programming functionality is implemented and working.
+This comprehensive guide covers advanced device programming patterns with Belay.NET, focusing on session management, resource tracking, and production-ready patterns.
 
-**Status**: ✅ Core functionality complete, 📝 Documentation in progress  
-**Expected completion**: After Issue 002-106 (Cross-Component Integration Layer)
-:::
+## Core Concepts
 
-## Coming Soon
+### Device Sessions
 
-This comprehensive guide will cover advanced device programming patterns with Belay.NET, including:
+A device session in Belay.NET represents the complete lifecycle of device communication:
 
-- **Advanced Attribute Patterns**: Complex attribute combinations and custom behaviors
-- **Session Management**: Managing long-lived device connections and state
-- **Error Handling Strategies**: Robust error handling and recovery patterns
-- **Performance Optimization**: Optimizing device communication for speed and reliability
-- **Multi-Device Coordination**: Managing multiple devices simultaneously
-- **Custom Executors**: Creating specialized execution patterns
-- **Memory Management**: Efficient resource usage on constrained devices
-- **Real-Time Operations**: Time-sensitive device control patterns
+- **Session Creation**: Initialize communication and detect device capabilities
+- **Resource Tracking**: Monitor deployed methods, background threads, and session resources
+- **Lifecycle Management**: Handle connection states, errors, and cleanup
+- **Performance Profiling**: Analyze device performance characteristics
 
-## Quick Preview
+### Session Management Architecture
+
+The session management system consists of several key components:
+
+- **DeviceSessionManager**: Central coordinator for all device sessions
+- **DeviceCapabilities**: Detects and tracks device features and performance
+- **ResourceTracker**: Manages session resources and prevents memory leaks
+- **FileSystemContext**: Provides file system state and caching capabilities
+
+## Session Management Examples
+
+### Basic Session Usage
 
 ```csharp
-// Example of what's coming - advanced device programming patterns
-public class AdvancedDeviceController : Device
-{
-    private readonly ILogger<AdvancedDeviceController> _logger;
-    private readonly SemaphoreSlim _criticalSectionLock = new(1, 1);
+using Belay.Core.Sessions;
+using Microsoft.Extensions.Logging;
 
-    [Setup(Priority = 1)]
-    public async Task InitializeHardwareAsync()
+public class IoTDeviceController
+{
+    private readonly IDeviceSessionManager _sessionManager;
+    private readonly ILogger<IoTDeviceController> _logger;
+
+    public IoTDeviceController(ILoggerFactory loggerFactory)
     {
-        await ExecuteAsync(@"
+        _sessionManager = new DeviceSessionManager(loggerFactory);
+        _logger = loggerFactory.CreateLogger<IoTDeviceController>();
+    }
+
+    public async Task<DeviceInfo> InitializeDeviceAsync(IDeviceCommunication communication)
+    {
+        // Create a managed session
+        var session = await _sessionManager.CreateSessionAsync(communication);
+        
+        _logger.LogInformation("Session {SessionId} created", session.SessionId);
+        
+        // Device capabilities are automatically detected
+        if (_sessionManager.Capabilities != null)
+        {
+            _logger.LogInformation("Device type: {DeviceType}", 
+                _sessionManager.Capabilities.DeviceType);
+            _logger.LogInformation("Supported features: {Features}", 
+                _sessionManager.Capabilities.SupportedFeatures);
+        }
+
+        // Execute initialization within session context
+        return await _sessionManager.ExecuteInSessionAsync(communication, async session =>
+        {
+            await communication.ExecuteAsync(@"
 from machine import Pin, Timer, ADC, PWM
 import time
+import gc
 
 # Hardware initialization
 led = Pin(25, Pin.OUT)
@@ -42,11 +71,30 @@ sensor = ADC(Pin(26))
 motor = PWM(Pin(16))
 motor.freq(1000)
 
-# Global state
-sensor_readings = []
-last_reading_time = 0
+# System status
+print(f'Free memory: {gc.mem_free()} bytes')
+print('Hardware initialized successfully')
 ");
+
+            // Get device information
+            var deviceInfo = await communication.ExecuteAsync<Dictionary<string, object>>(@"
+{
+    'platform': sys.platform,
+    'version': sys.version,
+    'memory_free': gc.mem_free(),
+    'unique_id': ubinascii.hexlify(machine.unique_id()).decode()
+}");
+
+            return new DeviceInfo
+            {
+                Platform = deviceInfo["platform"].ToString(),
+                Version = deviceInfo["version"].ToString(),
+                MemoryFree = Convert.ToInt32(deviceInfo["memory_free"]),
+                UniqueId = deviceInfo["unique_id"].ToString()
+            };
+        });
     }
+}
 
     [Task(Cache = true, CacheDurationMs = 5000)]
     public async Task<Dictionary<string, float>> GetSystemStatusAsync()

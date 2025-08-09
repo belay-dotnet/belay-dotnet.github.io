@@ -17,15 +17,10 @@ A device session represents the complete lifecycle of device communication:
 ```csharp
 public enum DeviceSessionState
 {
-    Created,        // Session created but not connected
-    Connecting,     // Connection in progress
-    Connected,      // Successfully connected
-    Active,         // Actively executing operations
-    Idle,           // Connected but not executing
-    Disconnecting,  // Disconnection in progress
-    Disconnected,   // Clean disconnection
-    Error,          // Error state requiring recovery
-    Disposed        // Session disposed and cleaned up
+    Inactive,       // Session manager is not active
+    Active,         // Session manager is active and can create sessions
+    Shutdown,       // Session manager is shutting down
+    Disposed        // Session manager has been disposed
 }
 ```
 
@@ -35,83 +30,137 @@ public enum DeviceSessionState
 
 ```csharp
 using Belay.Core;
+using Belay.Core.Communication;
 using Belay.Core.Sessions;
+using Microsoft.Extensions.Logging;
 
 public async Task BasicSessionExample()
 {
-    var sessionOptions = new DeviceSessionOptions
-    {
-        Port = "COM3",
-        ConnectionTimeout = TimeSpan.FromSeconds(30),
-        IdleTimeout = TimeSpan.FromMinutes(5),
-        EnableAutoReconnect = true,
-        MaxReconnectAttempts = 3
-    };
-
-    using var sessionManager = new DeviceSessionManager();
+    // Set up logging
+    using var loggerFactory = LoggerFactory.Create(builder => 
+        builder.AddConsole());
     
-    // Create a new session
-    var session = await sessionManager.CreateSessionAsync("sensor-device", sessionOptions);
+    // Create device communication
+    var logger = loggerFactory.CreateLogger<SerialDeviceCommunication>();
+    var communication = new SerialDeviceCommunication("COM3", 115200, logger: logger);
+    
+    // Create session manager
+    using var sessionManager = new DeviceSessionManager(loggerFactory);
     
     try
     {
-        // Execute operations within the session
-        await session.ExecuteAsync("print('Session started')");
+        // Create a session
+        var session = await sessionManager.CreateSessionAsync(communication);
         
-        var temperature = await session.ExecuteAsync<float>(@"
+        Console.WriteLine($"Session created: {session.SessionId}");
+        Console.WriteLine($"Session active: {session.IsActive}");
+        Console.WriteLine($"Manager state: {sessionManager.State}");
+        
+        // Execute operations through communication
+        var result = await communication.ExecuteAsync("2 + 3");
+        Console.WriteLine($"Result: {result}");
+        
+        // Get session statistics
+        var stats = await sessionManager.GetSessionStatsAsync();
+        Console.WriteLine($"Active sessions: {stats.ActiveSessionCount}");
+        
+        // Execute operation within session context
+        var temperature = await sessionManager.ExecuteInSessionAsync(communication, async session =>
+        {
+            return await communication.ExecuteAsync<float>(@"
 from machine import ADC, Pin
 sensor = ADC(Pin(26))
-sensor.read_u16() * 3.3 / 65536 * 100
-");
+sensor.read_u16() * 3.3 / 65536 * 100");
+        });
         
         Console.WriteLine($"Temperature: {temperature:F1}°C");
-        
-        // Session state is automatically managed
-        Console.WriteLine($"Session State: {session.State}");
     }
-    finally
+    catch (Exception ex)
     {
-        // Session is automatically disposed and cleaned up
+        Console.WriteLine($"Session error: {ex.Message}");
     }
+    // Session manager automatically disposed via using statement
 }
 ```
 
 ### Session with Dependency Injection
 
 ```csharp
-public class SensorService
+using Belay.Extensions;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+
+public class SensorService : BackgroundService
 {
-    private readonly IDeviceSessionFactory _sessionFactory;
+    private readonly IDeviceSessionManager _sessionManager;
+    private readonly IDeviceCommunication _communication;
     private readonly ILogger<SensorService> _logger;
     
-    public SensorService(IDeviceSessionFactory sessionFactory, ILogger<SensorService> logger)
+    public SensorService(
+        IDeviceSessionManager sessionManager, 
+        IDeviceCommunication communication,
+        ILogger<SensorService> logger)
     {
-        _sessionFactory = sessionFactory;
+        _sessionManager = sessionManager;
+        _communication = communication;
         _logger = logger;
     }
     
-    public async Task<SensorData> ReadSensorAsync(string deviceId)
+    public async Task<SensorData> ReadSensorAsync()
     {
-        using var session = await _sessionFactory.CreateSessionAsync(deviceId);
-        
-        return await session.ExecuteAsync<SensorData>(@"
+        return await _sessionManager.ExecuteInSessionAsync(_communication, async session =>
+        {
+            _logger.LogInformation("Reading sensor data in session {SessionId}", session.SessionId);
+            
+            var result = await _communication.ExecuteAsync(@"
 {
     'temperature': temp_sensor.read(),
     'humidity': humidity_sensor.read(),
     'pressure': pressure_sensor.read(),
     'timestamp': time.time()
-}
-");
+}");
+            return JsonSerializer.Deserialize<SensorData>(result);
+        });
+    }
+    
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    {
+        while (!stoppingToken.IsCancellationRequested)
+        {
+            try
+            {
+                var data = await ReadSensorAsync();
+                _logger.LogInformation("Sensor reading: {Temperature}°C", data.Temperature);
+                await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error reading sensor data");
+                await Task.Delay(TimeSpan.FromSeconds(30), stoppingToken);
+            }
+        }
     }
 }
 
-// Registration in Program.cs or Startup.cs
-services.AddDeviceSessionManagement(options =>
+// Registration in Program.cs
+var builder = Host.CreateDefaultBuilder(args);
+
+builder.ConfigureServices(services =>
 {
-    options.DefaultTimeout = TimeSpan.FromSeconds(30);
-    options.MaxConcurrentSessions = 10;
-    options.EnableSessionPooling = true;
+    // Add Belay.NET with session management
+    services.AddBelay(options =>
+    {
+        options.DefaultPort = "COM3";
+        options.DefaultBaudRate = 115200;
+        options.EnableSessionManagement = true;
+    });
+    
+    // Add the sensor service
+    services.AddHostedService<SensorService>();
 });
+
+var host = builder.Build();
+await host.RunAsync();
 ```
 
 ## Advanced Session Patterns
