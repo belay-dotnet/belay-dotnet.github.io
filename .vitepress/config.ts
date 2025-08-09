@@ -29,8 +29,9 @@ export default defineConfig({
     nav: [
       { text: 'Guide', link: '/guide/getting-started' },
       { text: 'Examples', link: '/examples/' },
-      { text: 'API Reference', link: '/api/' },
       { text: 'Hardware', link: '/hardware/' },
+      { text: 'Technical Reference', link: '/technical/' },
+      { text: 'API Reference', link: '/api/' },
       {
         text: 'v0.2.0',
         items: [
@@ -113,6 +114,29 @@ export default defineConfig({
           items: [
             { text: 'Connection Issues', link: '/hardware/troubleshooting-connections' },
             { text: 'Performance Issues', link: '/hardware/troubleshooting-performance' }
+          ]
+        }
+      ],
+      
+      '/technical/': [
+        {
+          text: 'Overview',
+          items: [
+            { text: 'Technical Reference', link: '/technical/' }
+          ]
+        },
+        {
+          text: 'Protocol Documentation',
+          items: [
+            { text: 'Raw REPL Protocol Deep Dive', link: '/technical/protocols/raw-repl-protocol' },
+            { text: 'Raw-Paste Mode and Flow Control', link: '/technical/protocols/raw-paste-mode' },
+            { text: 'Adaptive Protocol Detection', link: '/technical/protocols/protocol-detection' }
+          ]
+        },
+        {
+          text: 'Architecture Documentation',
+          items: [
+            { text: 'Session Management Architecture', link: '/technical/architecture/session-management' }
           ]
         }
       ]
