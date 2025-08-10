@@ -81,7 +81,7 @@ jobs:
           
           # Check critical navigation paths exist
           CRITICAL_PATHS=(
-            ".vitepress/dist/guide/index.html"
+            ".vitepress/dist/guide/getting-started.html"
             ".vitepress/dist/examples/index.html" 
             ".vitepress/dist/api/index.html"
           )

@@ -4,7 +4,7 @@ Auto-generated from XML documentation.
 
 ## Overview
 
-101 types documented in this assembly.
+132 types documented in this assembly.
 
 ### Belay.Core.Caching.CacheStatistics
 
