@@ -18,6 +18,17 @@ Belay.NET is compatible with any device listed on the MicroPython downloads page
 | PyBoard | ✅ | ❌ | USB Serial | Fully Supported |
 | CircuitPython Boards | ❌ | ✅ | USB Serial | Fully Supported |
 
+## Zero-Configuration Setup
+
+Belay.NET is designed for **zero-friction hardware integration**. Here's how simple it is:
+
+1. **Purchase any MicroPython-compatible device** from the [official downloads page](https://micropython.org/download/)
+2. **Flash official MicroPython firmware** (one-time setup, usually via drag-and-drop)
+3. **Plug in via USB** - no additional configuration needed
+4. **Install Belay.NET** and start coding immediately
+
+**No custom firmware modifications**, **no bootloader changes**, **no device-specific setup** - just official MicroPython and you're ready to go.
+
 ## Connection Types
 
 ### USB Serial (Recommended)
@@ -35,17 +46,6 @@ Wireless connection over WiFi for MicroPython devices.
 using var device = new Device(new WebReplDeviceCommunication("192.168.1.100", 8266));
 await device.StartAsync();
 ```
-
-## Zero-Configuration Setup
-
-Belay.NET is designed for **zero-friction hardware integration**. Here's how simple it is:
-
-1. **Purchase any MicroPython-compatible device** from the [official downloads page](https://micropython.org/download/)
-2. **Flash official MicroPython firmware** (one-time setup, usually via drag-and-drop)
-3. **Plug in via USB** - no additional configuration needed
-4. **Install Belay.NET** and start coding immediately
-
-**No custom firmware modifications**, **no bootloader changes**, **no device-specific setup** - just official MicroPython and you're ready to go.
 
 ## Detailed Guides
 

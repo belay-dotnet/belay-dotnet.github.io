@@ -16,7 +16,7 @@ def clean_text(text):
     return ' '.join(text.strip().split())
 
 def create_assembly_docs(xml_file):
-    """Create documentation for one assembly"""
+    """Create comprehensive documentation for one assembly"""
     try:
         tree = ET.parse(xml_file)
         root = tree.getroot()
@@ -25,27 +25,117 @@ def create_assembly_docs(xml_file):
         output_dir = Path(f"api/generated/{assembly_name}")
         output_dir.mkdir(parents=True, exist_ok=True)
         
+        # Organize members by type
+        types = {}
+        methods = {}
+        properties = {}
+        
+        for member in root.findall('.//member'):
+            name = member.get('name', '')
+            summary_elem = member.find('summary')
+            summary = clean_text(summary_elem.text if summary_elem is not None else "")
+            
+            if name.startswith('T:'):
+                # Type documentation
+                type_name = name[2:]
+                types[type_name] = {
+                    'summary': summary,
+                    'remarks': clean_text(member.find('remarks').text if member.find('remarks') is not None else ""),
+                    'examples': []
+                }
+                
+                # Extract examples
+                for example in member.findall('.//example'):
+                    if example.text:
+                        types[type_name]['examples'].append(clean_text(example.text))
+                        
+            elif name.startswith('M:'):
+                # Method documentation
+                method_name = name[2:]
+                type_prefix = method_name.split('#')[0] if '#' in method_name else method_name.rsplit('.', 1)[0]
+                
+                if type_prefix not in methods:
+                    methods[type_prefix] = []
+                
+                # Extract parameters
+                params = []
+                for param in member.findall('.//param'):
+                    param_name = param.get('name', '')
+                    param_desc = clean_text(param.text if param.text else "")
+                    params.append((param_name, param_desc))
+                
+                # Extract return value
+                returns_elem = member.find('returns')
+                returns = clean_text(returns_elem.text if returns_elem is not None else "")
+                
+                methods[type_prefix].append({
+                    'name': method_name,
+                    'summary': summary,
+                    'parameters': params,
+                    'returns': returns
+                })
+                
+            elif name.startswith('P:'):
+                # Property documentation
+                prop_name = name[2:]
+                type_prefix = prop_name.rsplit('.', 1)[0]
+                
+                if type_prefix not in properties:
+                    properties[type_prefix] = []
+                
+                properties[type_prefix].append({
+                    'name': prop_name,
+                    'summary': summary
+                })
+        
+        # Generate comprehensive documentation
         with open(output_dir / "README.md", "w") as f:
             f.write(f"# {assembly_name} API Reference\n\n")
-            f.write("Auto-generated from XML documentation.\n\n")
-            
-            # Get all types
-            types = []
-            for member in root.findall('.//member'):
-                name = member.get('name', '')
-                if name.startswith('T:'):
-                    type_name = name[2:]  # Remove T: prefix
-                    summary_elem = member.find('summary')
-                    summary = clean_text(summary_elem.text if summary_elem is not None else "")
-                    types.append((type_name, summary))
-            
+            f.write("Comprehensive API documentation generated from XML comments.\n\n")
             f.write(f"## Overview\n\n{len(types)} types documented in this assembly.\n\n")
             
-            # List types with summaries (limit to prevent huge docs)
-            for type_name, summary in types[:25]:
-                f.write(f"### {type_name}\n\n{summary}\n\n---\n\n")
+            # Generate detailed type documentation
+            for type_name, type_info in list(types.items())[:15]:  # Limit for size
+                f.write(f"## {type_name}\n\n")
+                f.write(f"{type_info['summary']}\n\n")
+                
+                if type_info['remarks']:
+                    f.write(f"### Remarks\n\n{type_info['remarks']}\n\n")
+                
+                # Add methods for this type
+                if type_name in methods:
+                    f.write("### Methods\n\n")
+                    for method in methods[type_name][:5]:  # Limit methods per type
+                        method_short = method['name'].split('.')[-1].split('(')[0]
+                        f.write(f"#### {method_short}\n\n")
+                        f.write(f"{method['summary']}\n\n")
+                        
+                        if method['parameters']:
+                            f.write("**Parameters:**\n\n")
+                            for param_name, param_desc in method['parameters']:
+                                f.write(f"- `{param_name}`: {param_desc}\n")
+                            f.write("\n")
+                        
+                        if method['returns']:
+                            f.write(f"**Returns:** {method['returns']}\n\n")
+                
+                # Add properties for this type
+                if type_name in properties:
+                    f.write("### Properties\n\n")
+                    for prop in properties[type_name][:5]:  # Limit properties per type
+                        prop_short = prop['name'].split('.')[-1]
+                        f.write(f"#### {prop_short}\n\n")
+                        f.write(f"{prop['summary']}\n\n")
+                
+                # Add examples
+                if type_info['examples']:
+                    f.write("### Examples\n\n")
+                    for example in type_info['examples'][:2]:  # Limit examples
+                        f.write(f"```csharp\n{example}\n```\n\n")
+                
+                f.write("---\n\n")
         
-        print(f"✅ Generated docs for {assembly_name}")
+        print(f"✅ Generated comprehensive docs for {assembly_name}")
         return True
         
     except Exception as e:

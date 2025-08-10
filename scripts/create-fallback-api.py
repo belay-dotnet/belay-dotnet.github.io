@@ -19,12 +19,20 @@ def create_fallback_api():
         "Belay.Core": {
             "description": "Core library providing device communication, method execution, and session management",
             "key_classes": [
-                "Device - Main device connection and communication class",
-                "TaskExecutor - Handles [Task] attribute method execution", 
-                "EnhancedExecutor - Advanced method interception framework",
-                "BaseExecutor - Base class for all method executors",
-                "SerialDeviceCommunication - USB/Serial device communication",
-                "SubprocessDeviceCommunication - Testing with MicroPython subprocess"
+                "**Device** - Main device connection and communication class",
+                "  - `ConnectAsync(string port)` - Connect to device on specified port",
+                "  - `ExecuteAsync<T>(string code)` - Execute Python code and return typed result", 
+                "  - `StartAsync()` - Initialize device communication",
+                "**TaskExecutor** - Handles [Task] attribute method execution",
+                "  - `ExecuteTaskAsync(MethodInfo, object[])` - Execute attributed method on device",
+                "  - Supports caching, timeouts, and result serialization",
+                "**EnhancedExecutor** - Advanced method interception framework",
+                "  - Pipeline-based execution with validation stages",
+                "  - Method interception caching and deployment optimization",
+                "**SerialDeviceCommunication** - USB/Serial device communication",
+                "  - `SendAsync(string)` - Send commands to device", 
+                "  - `ReceiveAsync()` - Receive responses from device",
+                "  - Automatic protocol detection and flow control"
             ]
         },
         "Belay.Attributes": {
