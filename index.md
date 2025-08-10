@@ -179,7 +179,7 @@ Console.WriteLine($"Current temperature: {temperature}°C");
   </div>
 </div>
 
-[View full compatibility matrix →](/hardware/compatibility)
+[View supported hardware →](https://belay-dotnet.github.io/hardware/)
 
 ## What's New in v0.2.0
 

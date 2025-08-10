@@ -101,7 +101,6 @@ export default defineConfig({
         {
           text: 'Supported Hardware',
           items: [
-            { text: 'Compatibility Matrix', link: '/hardware/compatibility' },
             { text: 'Connection Types', link: '/hardware/connections' }
           ]
         },

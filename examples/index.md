@@ -291,7 +291,7 @@ Most examples work with common development boards:
 - **ESP32**: Great for WiFi-enabled projects and advanced features
 - **PyBoard**: Original MicroPython board with rich peripheral support
 
-See our [Hardware Compatibility Matrix](../hardware/compatibility.md) for complete device support.
+See our [Hardware Guide](https://belay-dotnet.github.io/hardware/) for complete device support.
 
 ## Contributing Examples
 
