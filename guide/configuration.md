@@ -1,302 +1,513 @@
 # Configuration
 
-::: warning Documentation in Progress
-This documentation is currently being developed. The configuration management system is implemented in Issue 002-104.
 
-**Status**: ✅ Core functionality complete, 📝 Documentation in progress  
-**Expected completion**: After Issue 002-106 (Cross-Component Integration Layer)
-:::
+Belay.NET provides a comprehensive configuration system for customizing device communication, protocol settings, session management, and performance tuning. Configuration can be provided through code, JSON files, environment variables, or dependency injection.
 
-## Coming Soon
+## Configuration Overview
 
-This page will provide comprehensive guidance for configuring Belay.NET applications, including:
+The configuration system is organized into several key areas:
 
-- **BelayConfiguration Structure**: Complete configuration options and hierarchy
-- **Environment-Specific Settings**: Development, staging, and production configurations
-- **Connection Configuration**: Serial port settings, timeouts, and retry policies
-- **Performance Tuning**: Optimizing communication and execution parameters
-- **Logging Configuration**: Structured logging setup and verbosity levels
-- **Health Check Settings**: Monitoring and alerting configuration
-- **Security Configuration**: Secure communication and authentication settings
-- **ASP.NET Core Integration**: Configuration with dependency injection
+- **Device Configuration**: Connection timeouts, discovery settings, and retry policies
+- **Communication Configuration**: Serial port settings and Raw REPL protocol parameters
+- **Session Configuration**: Session management, timeouts, and cleanup behavior
+- **Executor Configuration**: Task execution, caching, and performance settings
+- **Exception Handling**: Error handling behavior and logging configuration
 
-## Quick Preview
+## Basic Configuration
+
+### Using Dependency Injection
 
 ```csharp
-// Example of what's coming - comprehensive Belay.NET configuration
+using Microsoft.Extensions.DependencyInjection;
+using Belay.Extensions.Configuration;
+
 public void ConfigureServices(IServiceCollection services)
 {
     services.AddBelay(config =>
     {
         // Device connection settings
         config.Device.DefaultConnectionTimeoutMs = 10000;
-        config.Device.AutoReconnect = true;
-        config.Device.ReconnectDelayMs = 2000;
-        config.Device.MaxReconnectAttempts = 5;
-
-        // Serial communication settings
+        config.Device.DefaultCommandTimeoutMs = 30000;
+        
+        // Communication settings
         config.Communication.Serial.DefaultBaudRate = 115200;
-        config.Communication.Serial.ReadTimeoutMs = 5000;
-        config.Communication.Serial.WriteTimeoutMs = 5000;
-        config.Communication.Serial.ReadBufferSize = 4096;
-        config.Communication.Serial.WriteBufferSize = 4096;
-
-        // Execution settings
-        config.Execution.DefaultTimeoutMs = 30000;
-        config.Execution.DefaultRetryAttempts = 3;
-        config.Execution.RetryDelayMs = 1000;
-        config.Execution.CacheEnabled = true;
-        config.Execution.CacheDefaultDurationMs = 30000;
-
+        config.Communication.Serial.ReadTimeoutMs = 1000;
+        config.Communication.Serial.WriteTimeoutMs = 1000;
+        
         // Session management
         config.Session.MaxConcurrentSessions = 10;
-        config.Session.SessionTimeoutMs = 300000; // 5 minutes
-        config.Session.IdleTimeoutMs = 60000;     // 1 minute
-        config.Session.CleanupIntervalMs = 30000; // 30 seconds
-
-        // Adaptive REPL protocol configuration
-        config.Protocol.RawRepl.EnableAdaptiveTiming = true;
-        config.Protocol.RawRepl.EnableAdaptiveFlowControl = true;
-        config.Protocol.RawRepl.EnableRawPasteAutoDetection = true;
-        config.Protocol.RawRepl.BaseResponseTimeoutMs = 2000;
-        config.Protocol.RawRepl.MaxResponseTimeoutMs = 30000;
-        config.Protocol.RawRepl.StartupDelayMs = 2000;
-        config.Protocol.RawRepl.MaxStartupDelayMs = 10000;
-        config.Protocol.RawRepl.InterruptDelayMs = 100;
-        config.Protocol.RawRepl.MaxRetryAttempts = 3;
-        config.Protocol.RawRepl.RetryDelayMs = 100;
-        config.Protocol.RawRepl.MinimumWindowSize = 16;
-        config.Protocol.RawRepl.MaximumWindowSize = 2048;
-        config.Protocol.RawRepl.PreferredWindowSize = null; // Auto-detect
-        config.Protocol.RawRepl.EnableVerboseLogging = false;
-
-        // Health check settings
-        config.HealthChecks.Enabled = true;
-        config.HealthChecks.CheckIntervalMs = 30000;
-        config.HealthChecks.FailureThreshold = 3;
-        config.HealthChecks.TimeoutMs = 10000;
-
-        // Logging settings
-        config.Logging.LogLevel = LogLevel.Information;
-        config.Logging.EnablePerformanceLogging = true;
-        config.Logging.EnableProtocolLogging = false; // Security: disable in production
+        config.Session.DefaultSessionTimeoutMs = 300000; // 5 minutes
+        config.Session.EnableSessionCleanup = true;
+        
+        // Task executor settings
+        config.Executor.DefaultTaskTimeoutMs = 30000;
+        config.Executor.MaxCacheSize = 1000;
+        config.Executor.EnableCachingByDefault = false;
+        config.Executor.CacheExpirationMs = 600000; // 10 minutes
+        
+        // Raw REPL protocol (adaptive settings)
+        config.Communication.RawRepl.EnableAdaptiveTiming = true;
+        config.Communication.RawRepl.EnableAdaptiveFlowControl = true;
+        config.Communication.RawRepl.EnableRawPasteAutoDetection = true;
+        config.Communication.RawRepl.BaseResponseTimeout = TimeSpan.FromSeconds(2);
+        config.Communication.RawRepl.MaxResponseTimeout = TimeSpan.FromSeconds(30);
+        config.Communication.RawRepl.PreferredWindowSize = null; // Auto-detect
+        
+        // Exception handling
+        config.ExceptionHandling.LogExceptions = true;
+        config.ExceptionHandling.IncludeStackTraces = true;
+        config.ExceptionHandling.PreserveContext = true;
     });
 }
 ```
 
-## Configuration Sources
+### Direct Configuration
 
 ```csharp
-// Configuration from multiple sources (coming soon)
-public void Configure(IConfiguration configuration)
+using Belay.Core;
+using Belay.Extensions.Configuration;
+
+// Create device with custom configuration
+var config = new BelayConfiguration
+{
+    Device = new DeviceConfiguration
+    {
+        DefaultConnectionTimeoutMs = 5000,
+        DefaultCommandTimeoutMs = 15000
+    },
+    Communication = new CommunicationConfiguration
+    {
+        Serial = new SerialConfiguration
+        {
+            DefaultBaudRate = 115200,
+            ReadTimeoutMs = 2000,
+            WriteTimeoutMs = 2000
+        }
+    }
+};
+
+// Use with device creation (when configuration support is added)
+// var device = Device.FromConnectionString("serial:COM3", config);
+```
+
+## Configuration Sources
+
+### JSON Configuration
+
+Belay.NET integrates with .NET's configuration system and can be configured via `appsettings.json`:
+
+```csharp
+public void ConfigureServices(IServiceCollection services, IConfiguration configuration)
 {
     services.AddBelay(config =>
     {
         // Bind from appsettings.json
         configuration.GetSection("Belay").Bind(config);
         
-        // Override with environment variables
-        config.Device.DefaultConnectionTimeoutMs = 
-            int.Parse(Environment.GetEnvironmentVariable("BELAY_CONNECTION_TIMEOUT") ?? "10000");
-            
+        // Override specific settings programmatically
+        config.Communication.RawRepl.EnableVerboseLogging = 
+            configuration.GetValue<bool>("Belay:Debug:EnableProtocolLogging");
+    });
+}
+```
+
+### Environment Variables
+
+```csharp
+services.AddBelay(config =>
+{
+    // Override with environment variables
+    config.Device.DefaultConnectionTimeoutMs = 
+        int.Parse(Environment.GetEnvironmentVariable("BELAY_CONNECTION_TIMEOUT") ?? "5000");
+        
+    config.Communication.Serial.DefaultBaudRate = 
+        int.Parse(Environment.GetEnvironmentVariable("BELAY_BAUD_RATE") ?? "115200");
+        
+    // Debug mode from environment
+    if (Environment.GetEnvironmentVariable("BELAY_DEBUG") == "true")
+    {
+        config.Communication.RawRepl.EnableVerboseLogging = true;
+        config.ExceptionHandling.IncludeStackTraces = true;
+    }
+});
+```
+
+### Command Line Arguments
+
+```csharp
+public void ConfigureServices(IServiceCollection services, string[] args)
+{
+    services.AddBelay(config =>
+    {
         // Override with command line arguments
         if (args.Contains("--debug"))
         {
-            config.Logging.LogLevel = LogLevel.Debug;
-            config.Logging.EnableProtocolLogging = true;
+            config.Communication.RawRepl.EnableVerboseLogging = true;
+            config.ExceptionHandling.IncludeStackTraces = true;
+        }
+        
+        if (args.Contains("--conservative"))
+        {
+            config.Communication.RawRepl.EnableAdaptiveTiming = false;
+            config.Communication.RawRepl.EnableAdaptiveFlowControl = false;
+            config.Communication.RawRepl.EnableRawPasteAutoDetection = false;
         }
     });
 }
 ```
 
-## appsettings.json Structure
+## Configuration File Format
+
+### appsettings.json Structure
 
 ```json
 {
   "Belay": {
     "Device": {
-      "DefaultConnectionTimeoutMs": 10000,
-      "AutoReconnect": true,
-      "ReconnectDelayMs": 2000,
-      "MaxReconnectAttempts": 5
+      "DefaultConnectionTimeoutMs": 5000,
+      "DefaultCommandTimeoutMs": 30000,
+      "Discovery": {
+        "EnableAutoDiscovery": true,
+        "DiscoveryTimeoutMs": 10000,
+        "SerialPortPatterns": ["COM*", "/dev/ttyUSB*", "/dev/ttyACM*"]
+      },
+      "Retry": {
+        "MaxRetries": 3,
+        "InitialRetryDelayMs": 1000,
+        "BackoffMultiplier": 2.0,
+        "MaxRetryDelayMs": 30000
+      }
     },
     "Communication": {
       "Serial": {
         "DefaultBaudRate": 115200,
-        "ReadTimeoutMs": 5000,
-        "WriteTimeoutMs": 5000,
-        "ReadBufferSize": 4096,
-        "WriteBufferSize": 4096
-      }
-    },
-    "Execution": {
-      "DefaultTimeoutMs": 30000,
-      "DefaultRetryAttempts": 3,
-      "RetryDelayMs": 1000,
-      "CacheEnabled": true,
-      "CacheDefaultDurationMs": 30000
-    },
-    "Protocol": {
+        "ReadTimeoutMs": 1000,
+        "WriteTimeoutMs": 1000
+      },
       "RawRepl": {
-        "EnableAdaptiveTiming": true,
-        "EnableAdaptiveFlowControl": true,
-        "EnableRawPasteAutoDetection": true,
-        "BaseResponseTimeoutMs": 2000,
-        "MaxResponseTimeoutMs": 30000,
-        "StartupDelayMs": 2000,
-        "MaxStartupDelayMs": 10000,
-        "InterruptDelayMs": 100,
-        "MaxRetryAttempts": 3,
-        "RetryDelayMs": 100,
+        "InitializationTimeout": "00:00:05",
+        "BaseResponseTimeout": "00:00:02",
+        "MaxResponseTimeout": "00:00:30",
+        "PreferredWindowSize": null,
         "MinimumWindowSize": 16,
         "MaximumWindowSize": 2048,
-        "PreferredWindowSize": null,
+        "MaxRetryAttempts": 3,
+        "RetryDelay": "00:00:00.100",
+        "StartupDelay": "00:00:02",
+        "MaxStartupDelay": "00:00:10",
+        "InterruptDelay": "00:00:00.100",
+        "EnableRawPasteAutoDetection": true,
+        "EnableAdaptiveTiming": true,
+        "EnableAdaptiveFlowControl": true,
         "EnableVerboseLogging": false
       }
     },
-    "HealthChecks": {
-      "Enabled": true,
-      "CheckIntervalMs": 30000,
-      "FailureThreshold": 3,
-      "TimeoutMs": 10000
+    "Session": {
+      "DefaultSessionTimeoutMs": 300000,
+      "MaxConcurrentSessions": 10,
+      "EnableSessionCleanup": true,
+      "SessionCleanupIntervalMs": 60000
+    },
+    "Executor": {
+      "DefaultTaskTimeoutMs": 30000,
+      "MaxCacheSize": 1000,
+      "EnableCachingByDefault": false,
+      "CacheExpirationMs": 600000
+    },
+    "ExceptionHandling": {
+      "RethrowExceptions": true,
+      "LogExceptions": true,
+      "IncludeStackTraces": true,
+      "ExceptionLogLevel": "Error",
+      "PreserveContext": true,
+      "MaxContextEntries": 50
     }
   }
 }
 ```
 
-## Environment-Specific Configuration
+### Environment-Specific Configuration
 
-### Development Environment
-- Verbose logging enabled
-- Protocol logging for debugging
-- Shorter timeouts for faster development cycles
-- Auto-reconnection enabled
+**appsettings.Development.json**:
+```json
+{
+  "Belay": {
+    "Communication": {
+      "RawRepl": {
+        "EnableVerboseLogging": true
+      }
+    },
+    "ExceptionHandling": {
+      "IncludeStackTraces": true,
+      "ExceptionLogLevel": "Debug"
+    }
+  }
+}
+```
 
-### Production Environment  
-- Minimal logging for performance
-- Protocol logging disabled for security
-- Conservative timeouts for reliability
-- Health checks enabled with alerting
+**appsettings.Production.json**:
+```json
+{
+  "Belay": {
+    "Communication": {
+      "RawRepl": {
+        "EnableVerboseLogging": false
+      }
+    },
+    "ExceptionHandling": {
+      "IncludeStackTraces": false,
+      "ExceptionLogLevel": "Error"
+    }
+  }
+}
+```
 
-### Testing Environment
-- Subprocess communication for hardware-independent testing
-- Fast timeouts for quick test execution
-- Detailed logging for test diagnostics
+## Configuration Reference
 
-## Adaptive REPL Protocol Configuration
-
-The adaptive REPL protocol system automatically detects MicroPython device capabilities and adjusts communication parameters for optimal compatibility and performance. These settings control the auto-detection and fallback behavior.
-
-### Core Adaptive Features
-
-| Setting | Default | Description |
-|---------|---------|-------------|
-| `EnableAdaptiveTiming` | `true` | Automatically adjusts timeouts based on measured device performance |
-| `EnableAdaptiveFlowControl` | `true` | Dynamically optimizes flow control parameters for raw-paste mode |
-| `EnableRawPasteAutoDetection` | `true` | Tests and enables raw-paste mode if supported by the device |
-
-### Timeout Configuration
-
-| Setting | Default | Description |
-|---------|---------|-------------|
-| `BaseResponseTimeoutMs` | `2000` | Initial timeout for device responses (auto-adjusted based on performance) |
-| `MaxResponseTimeoutMs` | `30000` | Maximum timeout after adaptive increases |
-| `StartupDelayMs` | `2000` | Initial delay for device startup (increased if device needs more time) |
-| `MaxStartupDelayMs` | `10000` | Maximum startup delay after adaptive increases |
-| `InterruptDelayMs` | `100` | Delay after sending interrupt sequences (increased for slow devices) |
-
-### Retry and Recovery Configuration
+### Device Configuration
 
 | Setting | Default | Description |
 |---------|---------|-------------|
-| `MaxRetryAttempts` | `3` | Number of retry attempts for failed operations |
-| `RetryDelayMs` | `100` | Base delay between retry attempts (uses exponential backoff) |
+| `DefaultConnectionTimeoutMs` | `5000` | Timeout for establishing device connections |
+| `DefaultCommandTimeoutMs` | `30000` | Default timeout for executing commands |
+| `Discovery.EnableAutoDiscovery` | `true` | Enable automatic device discovery |
+| `Discovery.DiscoveryTimeoutMs` | `10000` | Timeout for device discovery operations |
+| `Discovery.SerialPortPatterns` | `["COM*", "/dev/ttyUSB*", "/dev/ttyACM*"]` | Patterns for serial port scanning |
+| `Retry.MaxRetries` | `3` | Maximum number of operation retries |
+| `Retry.InitialRetryDelayMs` | `1000` | Initial delay between retries |
+| `Retry.BackoffMultiplier` | `2.0` | Exponential backoff multiplier |
+| `Retry.MaxRetryDelayMs` | `30000` | Maximum delay between retries |
 
-### Flow Control Configuration
+### Communication Configuration
 
 | Setting | Default | Description |
 |---------|---------|-------------|
-| `MinimumWindowSize` | `16` | Smallest acceptable window size during negotiation |
-| `MaximumWindowSize` | `2048` | Largest window size to request during negotiation |
-| `PreferredWindowSize` | `null` | Fixed window size (null = auto-detect optimal size) |
+| `Serial.DefaultBaudRate` | `115200` | Default serial communication baud rate |
+| `Serial.ReadTimeoutMs` | `1000` | Serial read operation timeout |
+| `Serial.WriteTimeoutMs` | `1000` | Serial write operation timeout |
 
-### Debugging Configuration
+### Session Configuration
 
 | Setting | Default | Description |
 |---------|---------|-------------|
-| `EnableVerboseLogging` | `false` | Enables detailed protocol logging for troubleshooting |
+| `DefaultSessionTimeoutMs` | `300000` | Default session timeout (5 minutes) |
+| `MaxConcurrentSessions` | `10` | Maximum concurrent device sessions |
+| `EnableSessionCleanup` | `true` | Enable automatic session cleanup |
+| `SessionCleanupIntervalMs` | `60000` | Session cleanup interval (1 minute) |
 
-### Fallback Configuration Example
+### Executor Configuration
 
-When auto-detection fails or for problematic devices, use conservative settings:
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `DefaultTaskTimeoutMs` | `30000` | Default timeout for task execution |
+| `MaxCacheSize` | `1000` | Maximum number of cached task results |
+| `EnableCachingByDefault` | `false` | Enable caching for all tasks by default |
+| `CacheExpirationMs` | `600000` | Cache expiration time (10 minutes) |
+
+### Exception Handling Configuration
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `RethrowExceptions` | `true` | Re-throw exceptions after handling |
+| `LogExceptions` | `true` | Log exceptions when they occur |
+| `IncludeStackTraces` | `true` | Include stack traces in exception logs |
+| `ExceptionLogLevel` | `Error` | Log level for exception messages |
+| `PreserveContext` | `true` | Preserve execution context in exceptions |
+| `MaxContextEntries` | `50` | Maximum context entries to preserve |
+
+## Raw REPL Protocol Configuration
+
+The Raw REPL protocol supports adaptive configuration that automatically detects device capabilities and adjusts communication parameters for optimal performance.
+
+### Core Protocol Settings
+
+| Setting | Default | Type | Description |
+|---------|---------|------|-------------|
+| `InitializationTimeout` | `00:00:05` | TimeSpan | Timeout for protocol initialization |
+| `BaseResponseTimeout` | `00:00:02` | TimeSpan | Base timeout for device responses |
+| `MaxResponseTimeout` | `00:00:30` | TimeSpan | Maximum response timeout after adaptive increases |
+| `StartupDelay` | `00:00:02` | TimeSpan | Initial device startup delay |
+| `MaxStartupDelay` | `00:00:10` | TimeSpan | Maximum startup delay after adjustments |
+| `InterruptDelay` | `00:00:00.100` | TimeSpan | Delay after interrupt sequences |
+| `RetryDelay` | `00:00:00.100` | TimeSpan | Base delay between retry attempts |
+| `MaxRetryAttempts` | `3` | int | Maximum retry attempts for operations |
+
+### Flow Control Settings
+
+| Setting | Default | Type | Description |
+|---------|---------|------|-------------|
+| `PreferredWindowSize` | `null` | int? | Fixed window size (null = auto-detect) |
+| `MinimumWindowSize` | `16` | int | Minimum acceptable window size |
+| `MaximumWindowSize` | `2048` | int | Maximum window size to request |
+
+### Adaptive Features
+
+| Setting | Default | Type | Description |
+|---------|---------|------|-------------|
+| `EnableRawPasteAutoDetection` | `true` | bool | Auto-detect raw-paste mode support |
+| `EnableAdaptiveTiming` | `true` | bool | Automatically adjust timeouts |
+| `EnableAdaptiveFlowControl` | `true` | bool | Optimize flow control parameters |
+| `EnableVerboseLogging` | `false` | bool | Enable detailed protocol logging |
+
+### Conservative Configuration
+
+For problematic devices or when auto-detection fails:
 
 ```csharp
 services.AddBelay(config =>
 {
-    // Disable adaptive features for manual control
-    config.Protocol.RawRepl.EnableAdaptiveTiming = false;
-    config.Protocol.RawRepl.EnableAdaptiveFlowControl = false;
-    config.Protocol.RawRepl.EnableRawPasteAutoDetection = false;
+    var conservative = config.Communication.RawRepl.CreateFallbackConfiguration();
+    config.Communication.RawRepl = conservative;
     
-    // Use conservative manual settings
-    config.Protocol.RawRepl.BaseResponseTimeoutMs = 5000;
-    config.Protocol.RawRepl.StartupDelayMs = 5000;
-    config.Protocol.RawRepl.InterruptDelayMs = 500;
-    config.Protocol.RawRepl.PreferredWindowSize = 32;
-    config.Protocol.RawRepl.MaxRetryAttempts = 5;
-    config.Protocol.RawRepl.RetryDelayMs = 500;
-    
-    // Enable verbose logging for troubleshooting
-    config.Protocol.RawRepl.EnableVerboseLogging = true;
+    // Or manually configure
+    config.Communication.RawRepl.EnableAdaptiveTiming = false;
+    config.Communication.RawRepl.EnableAdaptiveFlowControl = false;
+    config.Communication.RawRepl.EnableRawPasteAutoDetection = false;
+    config.Communication.RawRepl.BaseResponseTimeout = TimeSpan.FromSeconds(5);
+    config.Communication.RawRepl.StartupDelay = TimeSpan.FromSeconds(5);
+    config.Communication.RawRepl.InterruptDelay = TimeSpan.FromMilliseconds(500);
+    config.Communication.RawRepl.PreferredWindowSize = 32;
 });
 ```
 
-### Device-Specific Recommendations
+### Platform-Specific Settings
 
-#### ESP32/ESP8266 Devices
+**ESP32 (recommended)**:
 ```json
 {
-  "Protocol": {
+  "Communication": {
     "RawRepl": {
-      "StartupDelayMs": 3000,
-      "InterruptDelayMs": 200,
+      "StartupDelay": "00:00:03",
+      "InterruptDelay": "00:00:00.200",
       "PreferredWindowSize": 64
     }
   }
 }
 ```
 
-#### Raspberry Pi Pico
+**Raspberry Pi Pico (recommended)**:
 ```json
 {
-  "Protocol": {
+  "Communication": {
     "RawRepl": {
-      "StartupDelayMs": 1500,
-      "InterruptDelayMs": 50,
+      "StartupDelay": "00:00:01.500",
+      "InterruptDelay": "00:00:00.050",
       "PreferredWindowSize": 128
     }
   }
 }
 ```
 
-#### CircuitPython Devices
+**CircuitPython (recommended)**:
 ```json
 {
-  "Protocol": {
+  "Communication": {
     "RawRepl": {
       "EnableRawPasteAutoDetection": false,
-      "StartupDelayMs": 2500,
-      "InterruptDelayMs": 300
+      "StartupDelay": "00:00:02.500",
+      "InterruptDelay": "00:00:00.300"
     }
   }
 }
 ```
 
+## Environment-Specific Examples
+
+### Development Environment
+
+```csharp
+#if DEBUG
+services.AddBelay(config =>
+{
+    // Verbose logging for debugging
+    config.Communication.RawRepl.EnableVerboseLogging = true;
+    config.ExceptionHandling.IncludeStackTraces = true;
+    
+    // Shorter timeouts for faster development
+    config.Device.DefaultConnectionTimeoutMs = 3000;
+    config.Device.DefaultCommandTimeoutMs = 15000;
+    
+    // Enable auto-discovery
+    config.Device.Discovery.EnableAutoDiscovery = true;
+});
+#endif
+```
+
+### Production Environment
+
+```csharp
+#if RELEASE
+services.AddBelay(config =>
+{
+    // Minimal logging for performance
+    config.Communication.RawRepl.EnableVerboseLogging = false;
+    config.ExceptionHandling.IncludeStackTraces = false;
+    
+    // Conservative timeouts for reliability
+    config.Device.DefaultConnectionTimeoutMs = 10000;
+    config.Device.DefaultCommandTimeoutMs = 60000;
+    
+    // Enable caching for performance
+    config.Executor.EnableCachingByDefault = true;
+    config.Executor.CacheExpirationMs = 1800000; // 30 minutes
+});
+#endif
+```
+
+### Testing Environment
+
+```csharp
+services.AddBelay(config =>
+{
+    // Fast timeouts for quick tests
+    config.Device.DefaultConnectionTimeoutMs = 2000;
+    config.Device.DefaultCommandTimeoutMs = 10000;
+    
+    // Detailed logging for diagnostics
+    config.ExceptionHandling.LogExceptions = true;
+    config.ExceptionHandling.IncludeStackTraces = true;
+    
+    // Disable adaptive features for consistent behavior
+    config.Communication.RawRepl.EnableAdaptiveTiming = false;
+    config.Communication.RawRepl.EnableAdaptiveFlowControl = false;
+});
+```
+
+## Configuration Validation
+
+Belay.NET validates configuration at startup and provides helpful error messages:
+
+```csharp
+services.AddBelay(config =>
+{
+    // Invalid configuration will throw BelayConfigurationException
+    config.Device.DefaultConnectionTimeoutMs = -1; // Invalid: negative timeout
+    config.Communication.Serial.DefaultBaudRate = 0; // Invalid: zero baud rate
+    config.Session.MaxConcurrentSessions = -5; // Invalid: negative sessions
+});
+```
+
+## Best Practices
+
+1. **Environment-Specific Settings**: Use different configurations for development, testing, and production
+2. **Conservative Production Settings**: Disable verbose logging and use longer timeouts in production
+3. **Adaptive Features**: Enable adaptive protocol features for better device compatibility
+4. **Caching Strategy**: Configure caching based on your application's usage patterns
+5. **Timeout Management**: Set timeouts appropriate for your device types and network conditions
+6. **Error Handling**: Configure exception handling based on your logging and monitoring strategy
+
 ## Related Documentation
 
-- [Dependency Injection](/guide/dependency-injection) - DI setup and service registration
-- [Health Monitoring](/guide/health-monitoring) - Health check configuration
-- [Performance Troubleshooting](/hardware/troubleshooting-performance) - Performance-related settings
+- [Getting Started](/guide/getting-started) - Basic Belay.NET setup
+- [Testing](/guide/testing) - Test-specific configuration
+- [ESP32 Setup](/hardware/esp32) - ESP32-specific settings
+- [Raspberry Pi Pico](/hardware/raspberry-pi-pico) - Pico-specific settings
 - [ASP.NET Core Integration](/examples/aspnet-core) - Web application configuration
 
-**Need help now?** Check our [GitHub Discussions](https://github.com/belay-dotnet/Belay.NET/discussions) or review the [dependency injection guide](/guide/dependency-injection).
+## External Resources
+
+- [.NET Configuration Documentation](https://docs.microsoft.com/en-us/dotnet/core/extensions/configuration)
+- [Dependency Injection in .NET](https://docs.microsoft.com/en-us/dotnet/core/extensions/dependency-injection)
+- [MicroPython REPL Documentation](https://docs.micropython.org/en/latest/reference/repl.html)
+
+**Need help?** Check our [GitHub Discussions](https://github.com/belay-dotnet/Belay.NET/discussions) for configuration examples and troubleshooting.
