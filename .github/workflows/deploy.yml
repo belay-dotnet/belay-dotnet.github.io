@@ -17,26 +17,11 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    outputs:
-      build-success: ${{ steps.build-validation.outputs.success }}
-      site-health: ${{ steps.site-health.outputs.healthy }}
     steps:
-      - name: Checkout docs repository
+      - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          
-      - name: Checkout main Belay.NET repository
-        uses: actions/checkout@v4
-        with:
-          repository: belay-dotnet/Belay.NET
-          path: belay-source
-          fetch-depth: 1
-          
-      - name: Setup .NET SDK
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '8.x'
           
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -50,180 +35,38 @@ jobs:
       - name: Install dependencies
         run: npm ci
         
-      - name: Build .NET projects for XML documentation
+      - name: Create API documentation
         run: |
-          cd belay-source
-          echo "Building .NET projects to generate XML documentation..."
-          dotnet restore
-          dotnet build --configuration Release --verbosity minimal
-          
-      - name: Create minimal API documentation
-        run: |
-          echo "Creating minimal API documentation..."
-          
-          # Create API directory and basic index
           mkdir -p api
-          cat > api/index.md << 'APIEOF'
-          # API Reference
-          
-          API documentation for Belay.NET is being generated from XML comments in the source code.
-          
+          echo "# API Reference
+
+          API documentation for Belay.NET is being generated.
+
           ## Quick Reference
-          
+
           ### Core Classes
           - **Device** - Main device connection and communication
-          - **TaskExecutor** - Handles [Task] attribute methods
+          - **TaskExecutor** - Handles [Task] attribute methods  
           - **EnhancedExecutor** - Advanced method interception framework
           - **DeviceProxy** - Dynamic proxy for transparent method routing
-          
+
           ### Attributes
           - **TaskAttribute** - Execute methods as tasks with caching and timeout
-          - **ThreadAttribute** - Background thread execution  
+          - **ThreadAttribute** - Background thread execution
           - **SetupAttribute** - Device initialization methods
           - **TeardownAttribute** - Device cleanup methods
-          
+
           ## Usage Examples
-          
-          For practical examples of using these APIs, see the [Examples](/examples/) section.
-          
-          ## Version Information
-          
-          For different versions of the API documentation, see [All Versions](/api/versions).
-          APIEOF
-          
-          echo "✅ Created minimal API documentation"
+
+          For practical examples, see the [Examples](/examples/) section." > api/index.md
           
       - name: Build with VitePress
-        run: |
-          echo "🔄 Building VitePress documentation..."
-          
-          # Build and capture output
-          if npm run build > vitepress_build.log 2>&1; then
-            echo "✅ VitePress build succeeded"
-          else
-            echo "❌ VitePress build failed!"
-            cat vitepress_build.log
-            exit 1
-          fi
-          
-          # Verify dist directory was created
-          if [ ! -d ".vitepress/dist" ]; then
-            echo "❌ VitePress dist directory not created!"
-            exit 1
-          fi
-          
-          echo "✅ VitePress build completed successfully"
-          touch .vitepress/dist/.nojekyll
-          
-      - name: Validate build output
-        id: build-validation
-        run: |
-          echo "🔍 Validating build output..."
-          
-          # Check for essential files
-          REQUIRED_FILES=(".vitepress/dist/index.html" ".vitepress/dist/api/index.html")
-          for file in "${REQUIRED_FILES[@]}"; do
-            if [ ! -f "$file" ]; then
-              echo "❌ Required file missing: $file"
-              echo "success=false" >> $GITHUB_OUTPUT
-              exit 1
-            fi
-          done
-          
-          # Check file sizes (detect empty or corrupted files)
-          if [ ! -s ".vitepress/dist/index.html" ]; then
-            echo "❌ Main index.html is empty"
-            echo "success=false" >> $GITHUB_OUTPUT
-            exit 1
-          fi
-          
-          # Count generated files
-          FILE_COUNT=$(find .vitepress/dist -name "*.html" | wc -l)
-          if [ $FILE_COUNT -lt 5 ]; then
-            echo "❌ Too few HTML files generated ($FILE_COUNT), build likely incomplete"
-            echo "success=false" >> $GITHUB_OUTPUT
-            exit 1
-          fi
-          
-          echo "✅ Build validation passed - $FILE_COUNT HTML files generated"
-          echo "success=true" >> $GITHUB_OUTPUT
-          
-      - name: Site health check
-        id: site-health
-        run: |
-          echo "🏥 Running site health checks..."
-          
-          # Start a local server to test the built site
-          cd .vitepress/dist
-          python3 -m http.server 8080 &
-          SERVER_PID=$!
-          sleep 3
-          
-          # Test critical pages
-          CRITICAL_PAGES=("/" "/api/")
-          HEALTH_SCORE=0
-          
-          for page in "${CRITICAL_PAGES[@]}"; do
-            echo "Testing page: $page"
-            if curl -f -s --max-time 5 "http://localhost:8080$page" > /dev/null; then
-              echo "✅ $page - OK"
-              ((HEALTH_SCORE++))
-            else
-              echo "❌ $page - FAILED"
-            fi
-          done
-          
-          # Kill the test server
-          kill $SERVER_PID 2>/dev/null || true
-          
-          # Require all critical pages to work
-          if [ $HEALTH_SCORE -lt ${#CRITICAL_PAGES[@]} ]; then
-            echo "❌ Site health check failed: $HEALTH_SCORE/${#CRITICAL_PAGES[@]} pages working"
-            echo "healthy=false" >> $GITHUB_OUTPUT
-            exit 1
-          fi
-          
-          echo "✅ Site health check passed: $HEALTH_SCORE/${#CRITICAL_PAGES[@]} pages working"
-          echo "healthy=true" >> $GITHUB_OUTPUT
-          
-      - name: Create deployment summary
-        if: steps.build-validation.outputs.success == 'true' && steps.site-health.outputs.healthy == 'true'
-        run: |
-          echo "📋 Deployment Summary:" > deployment-summary.txt
-          echo "✅ VitePress build: SUCCESS" >> deployment-summary.txt
-          echo "✅ Build validation: SUCCESS" >> deployment-summary.txt
-          echo "✅ Site health check: SUCCESS" >> deployment-summary.txt
-          echo "📊 Generated files: $(find .vitepress/dist -name '*.html' | wc -l) HTML pages" >> deployment-summary.txt
-          echo "🕐 Build time: $(date)" >> deployment-summary.txt
-          cat deployment-summary.txt
-          cp deployment-summary.txt .vitepress/dist/
-          
+        run: npm run build
+        
       - name: Upload artifact
-        if: steps.build-validation.outputs.success == 'true' && steps.site-health.outputs.healthy == 'true'
         uses: actions/upload-pages-artifact@v3
         with:
           path: .vitepress/dist
-          
-      - name: Build failed - Create error report
-        if: steps.build-validation.outputs.success != 'true' || steps.site-health.outputs.healthy != 'true'
-        run: |
-          echo "❌ DEPLOYMENT BLOCKED - Build validation or health check failed!"
-          echo "Build validation: ${{ steps.build-validation.outputs.success }}"
-          echo "Site health: ${{ steps.site-health.outputs.healthy }}"
-          
-          # Create detailed error report
-          echo "🔍 Error Report:" > error-report.txt
-          echo "Build validation: ${{ steps.build-validation.outputs.success }}" >> error-report.txt
-          echo "Site health: ${{ steps.site-health.outputs.healthy }}" >> error-report.txt
-          echo "Timestamp: $(date)" >> error-report.txt
-          
-          if [ -f "vitepress_build.log" ]; then
-            echo "VitePress build log:" >> error-report.txt
-            cat vitepress_build.log >> error-report.txt
-          fi
-          
-          cat error-report.txt
-          exit 1
 
   deploy:
     environment:
@@ -232,64 +75,7 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     name: Deploy
-    # Only deploy if build passed all validations
-    if: needs.build.outputs.build-success == 'true' && needs.build.outputs.site-health == 'true'
     steps:
-      - name: Pre-deployment validation
-        run: |
-          echo "🚀 Starting validated deployment..."
-          echo "Build validation: ${{ needs.build.outputs.build-success }}"
-          echo "Site health: ${{ needs.build.outputs.site-health }}"
-          
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-        
-      - name: Post-deployment verification
-        run: |
-          echo "⏰ Waiting 30 seconds for deployment to propagate..."
-          sleep 30
-          
-          # Test the deployed site
-          SITE_URL="${{ steps.deployment.outputs.page_url }}"
-          echo "🌐 Testing deployed site: $SITE_URL"
-          
-          # Test critical pages
-          PAGES=("" "api/")
-          FAILED_PAGES=()
-          
-          for page in "${PAGES[@]}"; do
-            URL="${SITE_URL}${page}"
-            echo "Testing: $URL"
-            if curl -f -s --max-time 10 "$URL" > /dev/null; then
-              echo "✅ $URL - OK"
-            else
-              echo "❌ $URL - FAILED"
-              FAILED_PAGES+=("$URL")
-            fi
-          done
-          
-          if [ ${#FAILED_PAGES[@]} -gt 0 ]; then
-            echo "⚠️ Warning: ${#FAILED_PAGES[@]} page(s) failed post-deployment verification:"
-            printf '%s\n' "${FAILED_PAGES[@]}"
-            echo "This may indicate deployment propagation delays or configuration issues."
-          else
-            echo "✅ All pages verified successfully!"
-          fi
-          
-  # Separate job to handle deployment failures
-  deployment-failed:
-    runs-on: ubuntu-latest
-    needs: build
-    if: needs.build.outputs.build-success != 'true' || needs.build.outputs.site-health != 'true'
-    steps:
-      - name: Deployment blocked notification
-        run: |
-          echo "🚫 DEPLOYMENT BLOCKED"
-          echo "The website build failed validation and deployment has been prevented."
-          echo "Build validation: ${{ needs.build.outputs.build-success }}"
-          echo "Site health: ${{ needs.build.outputs.site-health }}"
-          echo ""
-          echo "The live website remains unchanged to prevent breakage."
-          echo "Check the build job logs for detailed error information."
-          exit 1

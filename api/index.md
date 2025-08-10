@@ -1,26 +1,12 @@
 # API Reference
 
-Comprehensive API documentation automatically generated from XML comments in the source code.
-
-## Version Selector
-
-::: tip Current Version
-You are viewing documentation for **main**.
-[View other versions →](/api/versions)
-:::
-
-## Generated Documentation
-
-- **[Belay.Attributes](./generated/Belay.Attributes/README.md)** - Belay.Attributes namespace documentation
-- **[Belay.Core](./generated/Belay.Core/README.md)** - Belay.Core namespace documentation
-- **[Belay.Extensions](./generated/Belay.Extensions/README.md)** - Belay.Extensions namespace documentation
-- **[Belay.Sync](./generated/Belay.Sync/README.md)** - Belay.Sync namespace documentation
+API documentation for Belay.NET is being generated.
 
 ## Quick Reference
 
 ### Core Classes
 - **Device** - Main device connection and communication
-- **TaskExecutor** - Handles [Task] attribute methods
+- **TaskExecutor** - Handles [Task] attribute methods  
 - **EnhancedExecutor** - Advanced method interception framework
 - **DeviceProxy** - Dynamic proxy for transparent method routing
 
@@ -30,8 +16,6 @@ You are viewing documentation for **main**.
 - **SetupAttribute** - Device initialization methods
 - **TeardownAttribute** - Device cleanup methods
 
-For detailed documentation, see the generated API reference above.
-
 ## Usage Examples
 
-For practical examples of using these APIs, see the [Examples](/examples/) section.
+For practical examples, see the [Examples](/examples/) section.
