@@ -1,5 +1,7 @@
 # Enhanced Executor Framework
 
+<!-- Documentation updated with comprehensive pre-commit testing system -->
+
 The Enhanced Executor Framework provides advanced method interception and pipeline processing capabilities for Belay.NET applications. It extends the existing executor infrastructure with transparent attribute-based programming and seamless C# to MicroPython method routing.
 
 ## Overview
