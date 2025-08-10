@@ -2,6 +2,16 @@
 
 Getting started with Belay.NET is straightforward. Choose your preferred installation method below.
 
+::: info Alpha Release
+Belay.NET v0.3.0-alpha is now available on NuGet! This is the first public alpha release featuring:
+- ✅ Task attribute system for simplified MicroPython programming
+- ✅ Raspberry Pi Pico and ESP32 hardware compatibility  
+- ✅ Comprehensive protocol support with adaptive Raw REPL
+- ✅ Full async/await programming model
+
+[View Release Notes](https://github.com/belay-dotnet/Belay.NET/releases/tag/v0.3.0-alpha) | [Hardware Compatibility](/hardware/compatibility)
+:::
+
 ## Prerequisites
 
 - **.NET 6 or later** (Belay.NET targets .NET 6+)
@@ -12,18 +22,25 @@ Getting started with Belay.NET is straightforward. Choose your preferred install
 
 ### Using Package Manager Console (Visual Studio)
 ```powershell
-Install-Package Belay.NET
+# Core functionality and device communication
+Install-Package Belay.Core -Version 0.3.0-alpha
+
+# Task attributes for simplified device programming
+Install-Package Belay.Attributes -Version 0.3.0-alpha
 ```
 
 ### Using .NET CLI
 ```bash
-dotnet add package Belay.NET
+# Install both core packages
+dotnet add package Belay.Core --version 0.3.0-alpha
+dotnet add package Belay.Attributes --version 0.3.0-alpha
 ```
 
 ### Using PackageReference
 Add to your `.csproj` file:
 ```xml
-<PackageReference Include="Belay.NET" Version="0.2.0" />
+<PackageReference Include="Belay.Core" Version="0.3.0-alpha" />
+<PackageReference Include="Belay.Attributes" Version="0.3.0-alpha" />
 ```
 
 ## Quick Start
@@ -33,24 +50,40 @@ Once installed, you can start using Belay.NET immediately:
 ```csharp
 using Belay.Core;
 using Belay.Core.Communication;
+using Belay.Attributes;
 
 // Create device connection
 using var device = new Device(new SerialDeviceCommunication("COM3"));
 await device.StartAsync();
 
-// Execute Python code on the device
+// Execute Python code directly
 var result = await device.ExecuteAsync<int>("21 + 21");
 Console.WriteLine($"Result: {result}"); // Outputs: Result: 42
+
+// Or use Task attributes for clean device programming
+public class MyDeviceProgram
+{
+    [Task]
+    public static int AddNumbers(int a, int b) => a + b;
+}
+
+// Deploy and execute Task methods
+var taskResult = await device.CallTaskAsync<int>("AddNumbers", 21, 21);
+Console.WriteLine($"Task Result: {taskResult}"); // Outputs: Task Result: 42
 ```
 
 ## Package Structure
 
-The main Belay.NET package includes:
+Belay.NET is distributed as separate NuGet packages:
 
-- **Belay.Core** - Core device communication
-- **Belay.Attributes** - Attribute-based programming
-- **Belay.Extensions** - Dependency injection extensions
-- **Belay.Sync** - File synchronization (coming soon)
+- **Belay.Core** - Core device communication and protocol handling
+- **Belay.Attributes** - Task attribute system for simplified device programming
+- **Belay.Extensions** - Dependency injection and ASP.NET Core integration (coming soon)
+- **Belay.Sync** - Advanced file synchronization capabilities (coming soon)
+
+::: tip Package Selection
+For most applications, install both `Belay.Core` and `Belay.Attributes` packages. The Task attribute system in `Belay.Attributes` provides the cleanest programming experience.
+:::
 
 ## Development Setup
 
