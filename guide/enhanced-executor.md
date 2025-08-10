@@ -200,6 +200,6 @@ var proxy = device.CreateProxy<IMyDevice>();
 ## See Also
 
 - [Attribute Reference](../articles/attributes-reference.md)
-- [Task Executor](task-executor.md)
-- [Thread Executor](thread-executor.md)
+- [Attribute Programming](./attributes.md)
+- [Device Communication](./device-communication.md)
 - [Device Programming](../articles/device-programming.md)
