@@ -151,17 +151,47 @@ def main():
     print(f"Processing {len(xml_files)} XML files...")
     
     if not xml_files:
-        print("❌ No XML files found, creating fallback documentation...")
+        print("❌ No XML files found, creating enhanced fallback documentation...")
         os.system("python3 scripts/create-fallback-api.py")
         return
     
     success_count = 0
+    low_quality_count = 0
+    
     for xml_file in xml_files:
-        if os.path.exists(xml_file) and create_assembly_docs(xml_file):
-            success_count += 1
+        if os.path.exists(xml_file):
+            # Check if XML has substantial content
+            try:
+                tree = ET.parse(xml_file)
+                root = tree.getroot()
+                members = root.findall('.//member')
+                
+                # Count members with actual documentation
+                documented_count = 0
+                for member in members:
+                    summary = member.find('summary')
+                    if summary is not None and summary.text and len(summary.text.strip()) > 20:
+                        documented_count += 1
+                
+                # If less than 30% have substantial documentation, consider it low quality
+                if len(members) > 0 and documented_count / len(members) < 0.3:
+                    print(f"⚠️  {xml_file} has minimal documentation ({documented_count}/{len(members)} documented)")
+                    low_quality_count += 1
+                
+            except Exception:
+                pass
+            
+            if create_assembly_docs(xml_file):
+                success_count += 1
+    
+    # If most files have low quality documentation, supplement with fallback
+    if low_quality_count > success_count / 2:
+        print(f"📝 XML documentation appears minimal, creating enhanced fallback documentation...")
+        os.system("python3 scripts/create-fallback-api.py")
+        return
     
     if success_count == 0:
-        print("❌ No XML files processed successfully, creating fallback documentation...")
+        print("❌ No XML files processed successfully, creating enhanced fallback documentation...")
         os.system("python3 scripts/create-fallback-api.py")
         return
         

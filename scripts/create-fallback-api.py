@@ -38,11 +38,26 @@ def create_fallback_api():
         "Belay.Attributes": {
             "description": "Attribute definitions for marking methods for device execution",
             "key_classes": [
-                "TaskAttribute - Execute methods as remote tasks with caching and timeout",
-                "ThreadAttribute - Background thread execution on device",
-                "SetupAttribute - Device initialization methods", 
-                "TeardownAttribute - Device cleanup methods",
-                "ThreadPriority - Priority levels for thread execution"
+                "**TaskAttribute** - Execute methods as remote tasks with caching and timeout",
+                "  - Properties: `Cache` (bool) - Enable method result caching",
+                "  - Properties: `TimeoutMs` (int) - Method execution timeout in milliseconds", 
+                "  - Properties: `Retry` (int) - Number of retry attempts on failure",
+                "  - Usage: `[Task(Cache = true, TimeoutMs = 5000)]`",
+                "**ThreadAttribute** - Background thread execution on device",
+                "  - Properties: `Priority` (ThreadPriority) - Thread execution priority",
+                "  - Properties: `AutoStart` (bool) - Whether to start thread automatically",
+                "  - Usage: `[Thread(Priority = ThreadPriority.High)]`",
+                "**SetupAttribute** - Device initialization methods",
+                "  - Called once when device connects and establishes communication",
+                "  - Perfect for hardware initialization: sensors, pins, configurations",
+                "  - Usage: `[Setup] public async Task InitializeAsync() { ... }`",
+                "**TeardownAttribute** - Device cleanup methods", 
+                "  - Called during device disconnection or disposal",
+                "  - Used for resource cleanup and proper device shutdown",
+                "  - Usage: `[Teardown] public async Task CleanupAsync() { ... }`",
+                "**ThreadPriority** - Enumeration for thread execution priorities",
+                "  - Values: `Low`, `Normal`, `High`, `Critical`",
+                "  - Used with ThreadAttribute to control execution priority"
             ]
         },
         "Belay.Sync": {
