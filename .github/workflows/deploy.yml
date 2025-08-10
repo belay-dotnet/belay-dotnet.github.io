@@ -63,6 +63,69 @@ jobs:
       - name: Build with VitePress
         run: npm run build
         
+      - name: Validate build output
+        run: |
+          echo "🔍 Validating VitePress build output..."
+          
+          # Check if dist directory exists and has content
+          if [ ! -d ".vitepress/dist" ]; then
+            echo "❌ Build failed: .vitepress/dist directory not found"
+            exit 1
+          fi
+          
+          # Check if index.html exists
+          if [ ! -f ".vitepress/dist/index.html" ]; then
+            echo "❌ Build failed: index.html not found in dist directory"
+            exit 1
+          fi
+          
+          # Check critical navigation paths exist
+          CRITICAL_PATHS=(
+            ".vitepress/dist/guide/index.html"
+            ".vitepress/dist/examples/index.html" 
+            ".vitepress/dist/api/index.html"
+          )
+          
+          for path in "${CRITICAL_PATHS[@]}"; do
+            if [ ! -f "$path" ]; then
+              echo "❌ Critical path missing: $path"
+              exit 1
+            fi
+          done
+          
+          # Check API documentation was generated
+          if [ ! -d ".vitepress/dist/api/generated" ]; then
+            echo "❌ API documentation not generated"
+            exit 1
+          fi
+          
+          echo "✅ Build validation passed"
+          
+      - name: Check for broken internal links
+        run: |
+          echo "🔗 Checking for broken internal links..."
+          
+          # Simple check for common broken link patterns in generated HTML
+          cd .vitepress/dist
+          
+          # Look for 404 patterns in navigation
+          if grep -r "404" --include="*.html" . | grep -q "nav\|menu"; then
+            echo "⚠️  Warning: Found potential navigation 404s"
+            grep -r "404" --include="*.html" . | grep "nav\|menu" | head -5
+          fi
+          
+          # Check that API links resolve
+          if ! grep -q "api/generated" api/index.html; then
+            echo "⚠️  Warning: API index may not link to generated docs"
+          fi
+          
+          echo "✅ Link check completed"
+          
+      - name: Comprehensive deployment validation
+        run: |
+          echo "🔍 Running comprehensive deployment validation..."
+          python3 scripts/validate-deployment.py
+        
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
