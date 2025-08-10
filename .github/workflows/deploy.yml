@@ -63,33 +63,33 @@ jobs:
           
           # Create API directory and basic index
           mkdir -p api
-          cat > api/index.md << 'EOF'
-# API Reference
-
-API documentation for Belay.NET is being generated from XML comments in the source code.
-
-## Quick Reference
-
-### Core Classes
-- **Device** - Main device connection and communication
-- **TaskExecutor** - Handles [Task] attribute methods
-- **EnhancedExecutor** - Advanced method interception framework
-- **DeviceProxy** - Dynamic proxy for transparent method routing
-
-### Attributes
-- **TaskAttribute** - Execute methods as tasks with caching and timeout
-- **ThreadAttribute** - Background thread execution  
-- **SetupAttribute** - Device initialization methods
-- **TeardownAttribute** - Device cleanup methods
-
-## Usage Examples
-
-For practical examples of using these APIs, see the [Examples](/examples/) section.
-
-## Version Information
-
-For different versions of the API documentation, see [All Versions](/api/versions).
-EOF
+          cat > api/index.md << 'APIEOF'
+          # API Reference
+          
+          API documentation for Belay.NET is being generated from XML comments in the source code.
+          
+          ## Quick Reference
+          
+          ### Core Classes
+          - **Device** - Main device connection and communication
+          - **TaskExecutor** - Handles [Task] attribute methods
+          - **EnhancedExecutor** - Advanced method interception framework
+          - **DeviceProxy** - Dynamic proxy for transparent method routing
+          
+          ### Attributes
+          - **TaskAttribute** - Execute methods as tasks with caching and timeout
+          - **ThreadAttribute** - Background thread execution  
+          - **SetupAttribute** - Device initialization methods
+          - **TeardownAttribute** - Device cleanup methods
+          
+          ## Usage Examples
+          
+          For practical examples of using these APIs, see the [Examples](/examples/) section.
+          
+          ## Version Information
+          
+          For different versions of the API documentation, see [All Versions](/api/versions).
+          APIEOF
           
           echo "✅ Created minimal API documentation"
           
