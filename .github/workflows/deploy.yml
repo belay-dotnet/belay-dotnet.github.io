@@ -23,6 +23,18 @@ jobs:
         with:
           fetch-depth: 0
           
+      - name: Checkout main Belay.NET repository
+        uses: actions/checkout@v4
+        with:
+          repository: belay-dotnet/Belay.NET
+          path: belay-source
+          fetch-depth: 1
+          
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.x'
+          
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -35,30 +47,18 @@ jobs:
       - name: Install dependencies
         run: npm ci
         
-      - name: Create API documentation
+      - name: Build .NET projects for XML documentation
         run: |
-          mkdir -p api
-          echo "# API Reference
-
-          API documentation for Belay.NET is being generated.
-
-          ## Quick Reference
-
-          ### Core Classes
-          - **Device** - Main device connection and communication
-          - **TaskExecutor** - Handles [Task] attribute methods  
-          - **EnhancedExecutor** - Advanced method interception framework
-          - **DeviceProxy** - Dynamic proxy for transparent method routing
-
-          ### Attributes
-          - **TaskAttribute** - Execute methods as tasks with caching and timeout
-          - **ThreadAttribute** - Background thread execution
-          - **SetupAttribute** - Device initialization methods
-          - **TeardownAttribute** - Device cleanup methods
-
-          ## Usage Examples
-
-          For practical examples, see the [Examples](/examples/) section." > api/index.md
+          cd belay-source
+          echo "Building .NET projects to generate XML documentation..."
+          dotnet restore --verbosity quiet
+          dotnet build --configuration Release --verbosity quiet
+        
+      - name: Generate API documentation
+        run: |
+          echo "Generating API documentation from XML files..."
+          mkdir -p api/generated
+          python3 scripts/generate-api-simple.py
           
       - name: Build with VitePress
         run: npm run build
