@@ -356,6 +356,21 @@ def main():
     xml_files = glob.glob("belay-source/src/*/bin/Release/net8.0/*.xml")
     xml_files = [f for f in xml_files if "ref" not in f]  # Skip reference assemblies
     
+    # If no XML files found in belay-source, fall back to existing approach
+    if not xml_files:
+        print("⚠️ No XML files found in belay-source, falling back to direct generation...")
+        # Use the original simple approach from the main script
+        import sys
+        sys.path.append('.')
+        
+        # Generate using existing XML files if available
+        existing_xml_files = glob.glob("../src/*/bin/Release/net8.0/*.xml")
+        if existing_xml_files:
+            xml_files = existing_xml_files
+        else:
+            print("⚠️ No XML documentation files available, skipping API generation")
+            xml_files = []
+    
     success_count = 0
     for xml_file in xml_files:
         if process_xml_file(xml_file, current_version):
