@@ -63,6 +63,7 @@ export default defineConfig({
         {
           text: 'Advanced',
           items: [
+            { text: 'Enhanced Executor Framework', link: '/guide/enhanced-executor' },
             { text: 'Session Management', link: '/guide/session-management' },
             { text: 'Health Monitoring', link: '/guide/health-monitoring' },
             { text: 'Configuration', link: '/guide/configuration' },
