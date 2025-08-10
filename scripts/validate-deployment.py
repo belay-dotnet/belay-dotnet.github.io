@@ -62,16 +62,29 @@ class DeploymentValidator:
             return
             
         # Check for expected assemblies (HTML files in built site)
-        expected_assemblies = ["Belay.Core", "Belay.Attributes", "Belay.Sync"]  # Belay.Extensions may fail StyleCop
+        expected_assemblies = ["Belay.Core", "Belay.Attributes", "Belay.Sync"]
         found_assemblies = []
+        fallback_count = 0
         
         for assembly in expected_assemblies:
             assembly_path = api_generated / assembly / "README.html"  # Built site has HTML files
             if assembly_path.exists():
                 found_assemblies.append(assembly)
                 self.stats["api_assemblies"] += 1
+                
+                # Check if it's fallback documentation
+                try:
+                    with open(assembly_path, 'r', encoding='utf-8') as f:
+                        content = f.read()
+                        if "Fallback documentation" in content:
+                            fallback_count += 1
+                except Exception:
+                    pass
             else:
                 self.log_warning(f"API documentation missing for {assembly}")
+        
+        if fallback_count > 0:
+            self.log_warning(f"Using fallback documentation for {fallback_count} assemblies due to build issues")
                 
         self.log_info(f"Found API documentation for {len(found_assemblies)}/{len(expected_assemblies)} assemblies")
         

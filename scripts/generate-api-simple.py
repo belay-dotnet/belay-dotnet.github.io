@@ -60,11 +60,21 @@ def main():
     
     print(f"Processing {len(xml_files)} XML files...")
     
+    if not xml_files:
+        print("❌ No XML files found, creating fallback documentation...")
+        os.system("python3 scripts/create-fallback-api.py")
+        return
+    
     success_count = 0
     for xml_file in xml_files:
         if os.path.exists(xml_file) and create_assembly_docs(xml_file):
             success_count += 1
     
+    if success_count == 0:
+        print("❌ No XML files processed successfully, creating fallback documentation...")
+        os.system("python3 scripts/create-fallback-api.py")
+        return
+        
     print(f"Successfully processed {success_count}/{len(xml_files)} XML files")
     
     # Create main API index
