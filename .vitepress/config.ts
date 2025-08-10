@@ -33,8 +33,9 @@ export default defineConfig({
       { text: 'Technical Reference', link: '/technical/' },
       { text: 'API Reference', link: '/api/' },
       {
-        text: 'v0.2.0',
+        text: 'main',
         items: [
+          { text: 'All Versions', link: '/api/versions' },
           { text: 'Changelog', link: '/changelog' },
           { text: 'Contributing', link: '/contributing' }
         ]

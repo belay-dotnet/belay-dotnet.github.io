@@ -61,10 +61,24 @@ jobs:
           
       - name: Generate API documentation from XML
         run: |
-          echo "Generating comprehensive API documentation..."
+          echo "Generating versioned API documentation..."
           
-          # Create a modified version of the script for CI environment
-          cat > generate-api-docs-ci.py << 'EOF'
+          # Copy the versioned documentation script
+          cp belay-source/docs/scripts/generate-versioned-api-docs.py ./
+          
+          # Install requests for GitHub API access
+          pip install requests
+          
+          # Generate versioned API documentation
+          python3 generate-versioned-api-docs.py
+          
+          echo "Versioned API documentation generation completed"
+          
+          # Fallback to simple generation if versioned script fails
+          if [ ! -d "api/generated" ]; then
+            echo "Falling back to simple API documentation generation..."
+            # Create a modified version of the script for CI environment
+            cat > generate-api-docs-ci.py << 'EOF'
           #!/usr/bin/env python3
           
           """
@@ -386,11 +400,12 @@ jobs:
               main()
           EOF
           
-          # Make the script executable and run it
-          chmod +x generate-api-docs-ci.py
-          python3 generate-api-docs-ci.py
-          
-          echo "API documentation generation completed"
+            # Make the script executable and run it
+            chmod +x generate-api-docs-ci.py
+            python3 generate-api-docs-ci.py
+            
+            echo "Fallback API documentation generation completed"
+          fi
           
       - name: Build with VitePress
         run: |

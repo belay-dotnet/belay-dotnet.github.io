@@ -2,6 +2,13 @@
 
 Comprehensive API documentation automatically generated from XML comments in the source code.
 
+## Version Selector
+
+::: tip Current Version
+You are viewing documentation for **main**.
+[View other versions →](/api/versions)
+:::
+
 ## Generated Documentation
 
 - **[Belay.Attributes](./generated/Belay.Attributes/README.md)** - Belay.Attributes namespace documentation
