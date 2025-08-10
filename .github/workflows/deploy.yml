@@ -398,10 +398,11 @@ jobs:
       - name: Build with VitePress
         run: |
           echo "🔄 Building VitePress documentation..."
-          npm run build 2>&1 | tee vitepress_build.log
           
-          # Check if build succeeded
-          if [ ${PIPESTATUS[0]} -ne 0 ]; then
+          # Build and capture output
+          if npm run build > vitepress_build.log 2>&1; then
+            echo "✅ VitePress build succeeded"
+          else
             echo "❌ VitePress build failed!"
             cat vitepress_build.log
             exit 1
