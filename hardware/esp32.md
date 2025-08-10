@@ -610,7 +610,7 @@ deepsleep({milliseconds})
 - [Connection Types](/hardware/connections) - USB and WebREPL setup  
 - [Getting Started](/guide/getting-started) - Basic Belay.NET setup
 - [Multiple Devices](/examples/multiple-devices) - Managing multiple ESP32s
-- [File Synchronization](/guide/file-sync) - Upload/download files
+- [Device Communication](/guide/device-communication) - File operations and data transfer
 
 ## External Resources
 

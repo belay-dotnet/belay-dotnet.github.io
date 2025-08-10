@@ -534,7 +534,7 @@ _thread.start_new_thread(core1_task, ())
 - [Connection Types](/hardware/connections) - Connection setup guide
 - [Getting Started](/guide/getting-started) - Basic Belay.NET setup
 - [Configuration Guide](/guide/configuration) - Pico-specific settings
-- [File Synchronization](/guide/file-sync) - File upload/download
+- [Device Communication](/guide/device-communication) - File operations and data transfer
 - [Testing Guide](/guide/testing) - Pico hardware testing
 
 ## External Resources
