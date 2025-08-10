@@ -5,6 +5,9 @@ export default defineConfig({
   description: 'Control MicroPython devices from .NET with zero friction',
   base: '/',
   
+  // Exclude build directories from VitePress processing
+  srcExclude: ['belay-source/**/*'],
+  
   head: [
     ['link', { rel: 'icon', type: 'image/svg+xml', href: '/logo.svg' }],
     ['link', { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }],
