@@ -4,10 +4,10 @@ Comprehensive API documentation automatically generated from XML comments.
 
 ## Generated Documentation
 
-- **[Belay.Attributes](./generated/Belay.Attributes/README.md)** - Belay.Attributes API documentation
-- **[Belay.Core](./generated/Belay.Core/README.md)** - Belay.Core API documentation
-- **[Belay.Extensions](./generated/Belay.Extensions/README.md)** - Belay.Extensions API documentation
-- **[Belay.Sync](./generated/Belay.Sync/README.md)** - Belay.Sync API documentation
+- **[Belay.Attributes](./generated/Belay.Attributes/README)** - Belay.Attributes API documentation
+- **[Belay.Core](./generated/Belay.Core/README)** - Belay.Core API documentation
+- **[Belay.Extensions](./generated/Belay.Extensions/README)** - Belay.Extensions API documentation
+- **[Belay.Sync](./generated/Belay.Sync/README)** - Belay.Sync API documentation
 
 
 ## Quick Reference
