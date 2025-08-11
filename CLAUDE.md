@@ -14,13 +14,13 @@ cd docs
 ```
 
 This script:
-1. Checks for required tools (DocFX, markitdown, Node.js)
-2. Installs missing dependencies
-3. Clones/updates the Belay.NET source repository
-4. Builds .NET projects for XML documentation
-5. Generates DocFX API documentation
-6. Converts HTML to VitePress-compatible markdown
-7. Tests the VitePress build
+1. Checks for required tools (DocFX, Node.js)
+2. Clones/updates the Belay.NET source repository if needed
+3. Builds .NET projects for XML documentation
+4. Generates DocFX API documentation with native markdown output
+5. Validates that API files were generated (985+ files expected)
+6. Tests the complete VitePress build
+7. Reports success/failure with detailed output
 
 ### Prerequisites
 

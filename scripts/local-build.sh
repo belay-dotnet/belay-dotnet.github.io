@@ -18,7 +18,7 @@ fi
 
 # Clean previous builds
 echo "🧹 Cleaning previous builds..."
-rm -rf api/generated/api
+rm -rf api/generated
 rm -rf .vitepress/dist
 rm -rf .vitepress/cache
 
@@ -52,7 +52,14 @@ echo "📖 Generating DocFX documentation with native markdown..."
 docfx metadata docfx.json
 
 echo "📁 Generated markdown files:"
+GENERATED_COUNT=$(find api/generated -name "*.md" 2>/dev/null | wc -l)
+if [ $GENERATED_COUNT -eq 0 ]; then
+    echo "❌ No markdown files generated! DocFX may have failed."
+    exit 1
+fi
+echo "✅ Generated $GENERATED_COUNT API documentation files"
 find api/generated -name "*.md" | head -10
+echo "... and $(($GENERATED_COUNT - 10)) more files"
 
 # Test VitePress build
 echo "🏗️  Testing VitePress build..."
