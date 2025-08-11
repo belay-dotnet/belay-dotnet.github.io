@@ -4,12 +4,14 @@
       "src": [
         {
           "files": [
-            "belay-source/src/**/*.csproj"
+            "belay-source/src/Belay.Attributes/Belay.Attributes.csproj",
+            "belay-source/src/Belay.Core/Belay.Core.csproj",
+            "belay-source/src/Belay.Extensions/Belay.Extensions.csproj",
+            "belay-source/src/Belay.Sync/Belay.Sync.csproj"
           ],
           "exclude": [
             "**/bin/**",
-            "**/obj/**",
-            "**/tests/**"
+            "**/obj/**"
           ]
         }
       ],
@@ -20,7 +22,18 @@
       "noRestore": false,
       "namespaceLayout": "flattened",
       "memberLayout": "samePage",
-      "allowCompilationErrors": true
+      "allowCompilationErrors": true,
+      "properties": {
+        "TargetFramework": "net8.0",
+        "Configurations": "Release",
+        "TreatWarningsAsErrors": "false",
+        "WarningsAsErrors": "",
+        "WarningsNotAsErrors": "",
+        "NoWarn": "1570;1571;1572;1573;1574;1580;1581;1584;1587;1589;1590;1591;1572;CS1591;SA1500;SA1201;SA1203;SA1117;SA1611;SA1651;SA1500;SA1649",
+        "RunAnalyzersDuringBuild": "false",
+        "RunStyleCopAnalyzers": "false",
+        "EnableNETAnalyzers": "false"
+      }
     }
   ],
   "build": {

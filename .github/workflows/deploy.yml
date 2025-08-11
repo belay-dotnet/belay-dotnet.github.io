@@ -51,28 +51,37 @@ jobs:
         run: |
           cd belay-source
           echo "Building .NET projects to generate XML documentation..."
-          set +e  # Don't fail on build errors
           
-          # Try full build first
+          # Create Directory.Build.props to disable analyzers
+          cat > Directory.Build.props << 'EOF'
+          <Project>
+            <PropertyGroup>
+              <!-- Disable all analyzers for documentation generation -->
+              <RunAnalyzersDuringBuild>false</RunAnalyzersDuringBuild>
+              <RunStyleCopAnalyzers>false</RunStyleCopAnalyzers>
+              <EnableNETAnalyzers>false</EnableNETAnalyzers>
+              <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+              <WarningsAsErrors />
+              <WarningsNotAsErrors />
+              
+              <!-- Suppress all StyleCop and documentation warnings -->
+              <NoWarn>1570;1571;1572;1573;1574;1580;1581;1584;1587;1589;1590;1591;CS1591;SA1500;SA1201;SA1203;SA1117;SA1611;SA1651;SA1649</NoWarn>
+              
+              <!-- Generate XML documentation for DocFX -->
+              <GenerateDocumentationFile>true</GenerateDocumentationFile>
+            </PropertyGroup>
+          </Project>
+          EOF
+          
+          # Build only source projects with analyzers disabled
+          echo "Building source projects with analyzers disabled..."
           dotnet restore --verbosity quiet
-          dotnet build --configuration Release --verbosity quiet
-          BUILD_SUCCESS=$?
-          
-          if [ $BUILD_SUCCESS -ne 0 ]; then
-            echo "⚠️  Full build failed, attempting individual project builds..."
-            
-            # Try building individual source projects
-            cd src
-            for project in Belay.Attributes Belay.Core Belay.Sync; do
-              echo "Building $project..."
-              cd $project 2>/dev/null && dotnet build --configuration Release --verbosity quiet --no-restore || echo "❌ $project build failed"
-              cd ..
-            done
-          else
-            echo "✅ Full build succeeded"
-          fi
-          
-          set -e  # Re-enable fail on error
+          cd src
+          for project in Belay.Attributes Belay.Core Belay.Extensions Belay.Sync; do
+            echo "Building $project..."
+            cd $project && dotnet build --configuration Release --verbosity quiet --no-restore -p:RunAnalyzersDuringBuild=false -p:TreatWarningsAsErrors=false && cd ..
+          done
+          echo "✅ Source projects built successfully"
         
       - name: Install DocFX and Pandoc
         run: |

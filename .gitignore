@@ -8,3 +8,6 @@ _site/
 obj/
 .docfx/
 
+# Temporary source clone for CI
+belay-source/
+
