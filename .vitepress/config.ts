@@ -8,7 +8,7 @@ export default defineConfig({
   // Temporarily disable dead link checking for API documentation
   ignoreDeadLinks: [
     // API documentation links will be fixed in navigation structure
-    /^\/api\/generated\//
+    /\.\/generated\/.*\/README$/
   ],
   
   // Exclude build directories from VitePress processing
