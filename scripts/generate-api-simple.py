@@ -108,12 +108,23 @@ def create_assembly_docs(xml_file):
                 # Add methods for this type
                 if type_name in methods:
                     f.write("### Methods\n\n")
-                    for method in methods[type_name][:5]:  # Limit methods per type
+                    for method in methods[type_name][:15]:  # Show more methods per type
                         # Extract method signature with parameters
                         full_name = method['name']
+                        
+                        # Extract method name and signature properly
                         if '(' in full_name:
-                            # Has parameters - show full signature 
-                            method_display = full_name.split('.')[-1]  # Get just the method part
+                            # Find the method name before the opening parenthesis
+                            paren_index = full_name.find('(')
+                            before_paren = full_name[:paren_index]  # Everything before (
+                            after_paren = full_name[paren_index:]   # Everything from ( onwards
+                            
+                            # Get just the method name part (last component before params)
+                            method_name_part = before_paren.split('.')[-1]  # e.g., "Get``1"
+                            
+                            # Clean up generic markers and combine with parameters  
+                            clean_method_name = method_name_part.replace('``1', '<T>').replace('``2', '<T,U>')
+                            method_display = clean_method_name + after_paren
                         else:
                             # No parameters - just method name
                             method_display = full_name.split('.')[-1]
