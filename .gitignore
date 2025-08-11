@@ -11,3 +11,4 @@ obj/
 # Temporary source clone for CI
 belay-source/
 
+docfx-linux-x64-*.zip
