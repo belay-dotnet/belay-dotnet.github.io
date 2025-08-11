@@ -4,10 +4,15 @@ Comprehensive API documentation automatically generated from XML comments.
 
 ## Generated Documentation
 
-- **[Belay.Attributes](./generated/Belay.Attributes/README)** - Belay.Attributes API documentation
-- **[Belay.Core](./generated/Belay.Core/README)** - Belay.Core API documentation
-- **[Belay.Extensions](./generated/Belay.Extensions/README)** - Belay.Extensions API documentation
-- **[Belay.Sync](./generated/Belay.Sync/README)** - Belay.Sync API documentation
+::: info API Documentation Status
+API documentation is automatically generated from XML comments during the CI build process. 
+If you see 404 errors, the site may be in the middle of a deployment update.
+:::
+
+- **[Belay.Attributes](./generated/Belay.Attributes/)** - Attribute-based method decorators for device operations
+- **[Belay.Core](./generated/Belay.Core/)** - Core device communication and session management  
+- **[Belay.Extensions](./generated/Belay.Extensions/)** - Dependency injection and configuration extensions
+- **[Belay.Sync](./generated/Belay.Sync/)** - File synchronization utilities for device storage
 
 
 ## Quick Reference

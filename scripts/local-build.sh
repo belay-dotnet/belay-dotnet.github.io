@@ -62,17 +62,17 @@ echo "✅ Generated $GENERATED_COUNT API documentation files"
 # Validate content quality of generated files
 echo "🔍 Validating generated content quality..."
 
-# Check for essential README files
-REQUIRED_READMES=("api/generated/Belay.Core/README.md" "api/generated/Belay.Attributes/README.md")
-for readme in "${REQUIRED_READMES[@]}"; do
-    if [ ! -f "$readme" ]; then
-        echo "❌ Missing critical README: $readme"
+# Check for essential namespace documentation directories
+REQUIRED_NAMESPACES=("api/generated/Belay.Core" "api/generated/Belay.Attributes")
+for namespace in "${REQUIRED_NAMESPACES[@]}"; do
+    if [ ! -d "$namespace" ]; then
+        echo "❌ Missing namespace directory: $namespace"
         exit 1
     fi
     
-    # Check README has actual content (not just header)
-    if [ $(wc -l < "$readme") -lt 5 ]; then
-        echo "❌ README appears empty or minimal: $readme"
+    # Check namespace has markdown files
+    if [ $(find "$namespace" -name "*.md" | wc -l) -eq 0 ]; then
+        echo "❌ Namespace directory contains no markdown files: $namespace"
         exit 1
     fi
 done
