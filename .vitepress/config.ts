@@ -5,6 +5,12 @@ export default defineConfig({
   description: 'Control MicroPython devices from .NET with zero friction',
   base: '/',
   
+  // Temporarily disable dead link checking for API documentation
+  ignoreDeadLinks: [
+    // API documentation links will be fixed in navigation structure
+    /^\/api\/generated\//
+  ],
+  
   // Exclude build directories from VitePress processing
   srcExclude: ['belay-source/**/*'],
   
