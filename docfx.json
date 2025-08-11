@@ -1,0 +1,63 @@
+{
+  "metadata": [
+    {
+      "src": [
+        {
+          "files": [
+            "belay-source/src/**/*.csproj"
+          ],
+          "exclude": [
+            "**/bin/**",
+            "**/obj/**",
+            "**/tests/**"
+          ]
+        }
+      ],
+      "dest": "api/metadata",
+      "includePrivateMembers": false,
+      "disableGitFeatures": false,
+      "disableDefaultFilter": false,
+      "noRestore": false,
+      "namespaceLayout": "flattened",
+      "memberLayout": "samePage",
+      "allowCompilationErrors": true
+    }
+  ],
+  "build": {
+    "content": [
+      {
+        "files": [
+          "api/metadata/*.yml",
+          "api/metadata/**/*.yml"
+        ]
+      }
+    ],
+    "resource": [
+      {
+        "files": [
+          "images/**"
+        ]
+      }
+    ],
+    "output": "api/generated",
+    "template": [
+      "default",
+      "modern"
+    ],
+    "postProcessors": ["ExtractSearchIndex"],
+    "markdownEngineName": "markdig",
+    "noLangKeyword": false,
+    "keepFileLink": false,
+    "cleanupCacheHistory": false,
+    "disableGitFeatures": false,
+    "globalMetadata": {
+      "_appTitle": "Belay.NET API Reference",
+      "_appName": "Belay.NET",
+      "_enableSearch": true,
+      "_gitContribute": {
+        "repo": "https://github.com/belay-dotnet/Belay.NET",
+        "branch": "main"
+      }
+    }
+  }
+}

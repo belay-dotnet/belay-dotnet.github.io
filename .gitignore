@@ -1,4 +1,10 @@
 
 # Auto-generated API documentation
 api/generated/
+api/metadata/
+
+# DocFX temporary files
+_site/
+obj/
+.docfx/
 
