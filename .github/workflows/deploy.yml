@@ -52,13 +52,18 @@ jobs:
           cd belay-source
           echo "Building source projects only for XML documentation..."
           
-          # Build each source project individually to avoid test dependencies
+          # Build each source project individually with StyleCop disabled
           cd src
           for project in Belay.Attributes Belay.Core Belay.Extensions Belay.Sync; do
             echo "Building $project..."
             cd $project
             dotnet restore --verbosity quiet
-            dotnet build --configuration Release --verbosity quiet
+            # Build with StyleCop disabled for documentation generation
+            dotnet build --configuration Release --verbosity quiet \
+              -p:RunStyleCopAnalyzers=false \
+              -p:TreatWarningsAsErrors=false \
+              -p:RunAnalyzersDuringBuild=false \
+              -p:EnableNETAnalyzers=false
             if [ $? -ne 0 ]; then
               echo "❌ $project build failed"
               exit 1

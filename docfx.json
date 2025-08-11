@@ -26,14 +26,15 @@
       "allowCompilationErrors": true,
       "properties": {
         "TargetFramework": "net8.0",
-        "Configurations": "Release",
+        "Configuration": "Release",
         "TreatWarningsAsErrors": "false",
         "WarningsAsErrors": "",
         "WarningsNotAsErrors": "",
-        "NoWarn": "1570;1571;1572;1573;1574;1580;1581;1584;1587;1589;1590;1591;1572;CS1591;SA1500;SA1201;SA1203;SA1117;SA1611;SA1651;SA1500;SA1649",
+        "NoWarn": "1570;1571;1572;1573;1574;1580;1581;1584;1587;1589;1590;1591;CS1591;SA1500;SA1201;SA1203;SA1117;SA1611;SA1651;SA1649",
         "RunAnalyzersDuringBuild": "false",
         "RunStyleCopAnalyzers": "false",
-        "EnableNETAnalyzers": "false"
+        "EnableNETAnalyzers": "false",
+        "ContinueOnError": "ErrorAndContinue"
       }
     }
   ],

@@ -30,14 +30,19 @@ if [ ! -d "../belay-source" ]; then
     cd docs
 fi
 
-# Build .NET projects
+# Build .NET projects for XML documentation only (disable StyleCop)
 echo "🔨 Building .NET projects for XML documentation..."
 cd ../belay-source/src
 for project in Belay.Attributes Belay.Core Belay.Extensions Belay.Sync; do
     echo "  Building $project..."
     cd $project
     dotnet restore --verbosity quiet
-    dotnet build --configuration Release --verbosity quiet
+    # Build with StyleCop disabled for documentation generation
+    dotnet build --configuration Release --verbosity quiet \
+        -p:RunStyleCopAnalyzers=false \
+        -p:TreatWarningsAsErrors=false \
+        -p:RunAnalyzersDuringBuild=false \
+        -p:EnableNETAnalyzers=false
     if [ $? -ne 0 ]; then
         echo "❌ $project build failed"
         exit 1
@@ -62,19 +67,15 @@ echo "✅ Generated $GENERATED_COUNT API documentation files"
 # Validate content quality of generated files
 echo "🔍 Validating generated content quality..."
 
-# Check for essential namespace documentation directories
-REQUIRED_NAMESPACES=("api/generated/Belay.Core" "api/generated/Belay.Attributes")
+# Check for essential namespace documentation files (flat structure)
+REQUIRED_NAMESPACES=("Belay.Core" "Belay.Attributes" "Belay.Extensions" "Belay.Sync")
 for namespace in "${REQUIRED_NAMESPACES[@]}"; do
-    if [ ! -d "$namespace" ]; then
-        echo "❌ Missing namespace directory: $namespace"
+    NAMESPACE_FILES=$(find api/generated -name "${namespace}.*.md" | wc -l)
+    if [ $NAMESPACE_FILES -eq 0 ]; then
+        echo "❌ No files found for namespace: $namespace"
         exit 1
     fi
-    
-    # Check namespace has markdown files
-    if [ $(find "$namespace" -name "*.md" | wc -l) -eq 0 ]; then
-        echo "❌ Namespace directory contains no markdown files: $namespace"
-        exit 1
-    fi
+    echo "✅ Found $NAMESPACE_FILES files for namespace $namespace"
 done
 
 # Validate sample files have proper markdown structure
@@ -93,9 +94,9 @@ for file in "${SAMPLE_FILES[@]}"; do
     fi
 done
 
-# Check for expected namespace structure
-if [ ! -d "api/generated/Belay.Core" ] || [ ! -d "api/generated/Belay.Attributes" ]; then
-    echo "❌ Missing expected namespace directories"
+# Check for main namespace files
+if [ ! -f "api/generated/Belay.Core.md" ] || [ ! -f "api/generated/Belay.Attributes.md" ]; then
+    echo "❌ Missing main namespace documentation files"
     exit 1
 fi
 

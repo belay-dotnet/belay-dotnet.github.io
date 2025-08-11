@@ -9,10 +9,10 @@ API documentation is automatically generated from XML comments during the CI bui
 If you see 404 errors, the site may be in the middle of a deployment update.
 :::
 
-- **[Belay.Attributes](./generated/Belay.Attributes/)** - Attribute-based method decorators for device operations
-- **[Belay.Core](./generated/Belay.Core/)** - Core device communication and session management  
-- **[Belay.Extensions](./generated/Belay.Extensions/)** - Dependency injection and configuration extensions
-- **[Belay.Sync](./generated/Belay.Sync/)** - File synchronization utilities for device storage
+- **[Belay.Attributes](./generated/Belay.Attributes)** - Attribute-based method decorators for device operations
+- **[Belay.Core](./generated/Belay.Core)** - Core device communication and session management  
+- **[Belay.Extensions](./generated/Belay.Extensions)** - Dependency injection and configuration extensions
+- **[Belay.Sync](./generated/Belay.Sync)** - File synchronization utilities for device storage
 
 
 ## Quick Reference
