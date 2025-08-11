@@ -55,7 +55,16 @@ def create_assembly_docs(xml_file):
             elif name.startswith('M:'):
                 # Method documentation
                 method_name = name[2:]
-                type_prefix = method_name.split('#')[0] if '#' in method_name else method_name.rsplit('.', 1)[0]
+                
+                # Extract type prefix correctly for methods with parameters
+                if '(' in method_name:
+                    # Method has parameters, find the last dot before the method name
+                    paren_index = method_name.find('(')
+                    before_paren = method_name[:paren_index]  # e.g., "Belay.Core.Caching.IMethodDeploymentCache.Get``1"
+                    type_prefix = before_paren.rsplit('.', 1)[0]  # e.g., "Belay.Core.Caching.IMethodDeploymentCache"
+                else:
+                    # No parameters, use original logic
+                    type_prefix = method_name.split('#')[0] if '#' in method_name else method_name.rsplit('.', 1)[0]
                 
                 if type_prefix not in methods:
                     methods[type_prefix] = []
