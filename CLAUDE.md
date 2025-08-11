@@ -4,14 +4,23 @@ This file provides specific guidance for working on the belay-dotnet.github.io d
 
 ## Local Build Testing
 
-**CRITICAL**: Always test changes locally before pushing to CI to avoid breaking the deployed website.
+**MANDATORY PRE-COMMIT REQUIREMENT**: The local build script MUST be run and MUST pass before every single commit. This is non-negotiable to prevent CI failures and website breaks.
 
-### Quick Local Build Test
+### REQUIRED Pre-Commit Workflow
 
 ```bash
 cd docs
+
+# MANDATORY: Test locally before every commit
 ./scripts/local-build.sh
+
+# ONLY commit if local build succeeds completely
+git add .
+git commit -m "Your changes"
+git push
 ```
+
+**⚠️ WARNING**: Commits without successful local build testing will likely break CI and the deployed website. The script validates the complete documentation pipeline including DocFX generation and VitePress building.
 
 This script:
 1. Checks for required tools (DocFX, Node.js)
@@ -70,27 +79,36 @@ The documentation website includes auto-generated API documentation through this
 
 ### Testing Changes
 
-1. **Always run local build first**: `./scripts/local-build.sh`
-2. **Check the generated markdown**: Look for HTML parsing issues in `api/generated/`
-3. **Verify VitePress can parse files**: Local build will fail if markdown is malformed
-4. **Test navigation**: Ensure API documentation is accessible through the website
+1. **MANDATORY**: Run `./scripts/local-build.sh` - NO EXCEPTIONS
+2. **Validate generation**: Ensure 985+ API files are created
+3. **Verify VitePress build**: Script will fail if website build breaks
+4. **Check output**: Review script output for any warnings or issues
 
-### Development Workflow
+### MANDATORY Development Workflow
+
+**⚠️ CRITICAL REQUIREMENT**: Local build testing is MANDATORY for every commit.
 
 ```bash
-# 1. Make changes to DocFX configuration
-vim docfx.json
+# 1. Make any changes to documentation
+vim docfx.json  # or any other files
 
-# 2. Test locally BEFORE committing
+# 2. MANDATORY: Test locally BEFORE committing - NO EXCEPTIONS
 ./scripts/local-build.sh
 
-# 3. If build succeeds, commit and push
-git add .
-git commit -m "Update API documentation generation"
-git push
+# 3. ONLY proceed if local build passes completely
+if [ $? -eq 0 ]; then
+    git add .
+    git commit -m "Update documentation"
+    git push
+else
+    echo "❌ FIX LOCAL BUILD ISSUES BEFORE COMMITTING"
+    exit 1
+fi
 
-# 4. Monitor CI for successful deployment
+# 4. Monitor CI (should succeed if local build passed)
 gh run list --limit 1
 ```
+
+**ENFORCEMENT**: Any commit that breaks CI due to skipped local testing is considered a process violation. The local build script catches 99% of issues before they reach CI.
 
 This approach prevents broken deployments and ensures the website remains functional.
