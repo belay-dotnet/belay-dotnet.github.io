@@ -184,9 +184,9 @@ def main():
             if create_assembly_docs(xml_file):
                 success_count += 1
     
-    # If most files have low quality documentation, supplement with fallback
-    if low_quality_count > success_count / 2:
-        print(f"📝 XML documentation appears minimal, creating enhanced fallback documentation...")
+    # If any files have low quality documentation, use enhanced fallback
+    if low_quality_count > 0:
+        print(f"📝 XML documentation appears minimal for {low_quality_count} files, creating enhanced fallback documentation...")
         os.system("python3 scripts/create-fallback-api.py")
         return
     
