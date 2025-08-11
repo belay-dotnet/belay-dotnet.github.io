@@ -151,9 +151,9 @@ def main():
     print(f"Processing {len(xml_files)} XML files...")
     
     if not xml_files:
-        print("❌ No XML files found, creating enhanced fallback documentation...")
-        os.system("python3 scripts/create-fallback-api.py")
-        return
+        print("❌ DEPLOYMENT BLOCKED: No XML files found")
+        print("❌ .NET build failed to generate XML documentation files")
+        sys.exit(1)
     
     success_count = 0
     low_quality_count = 0
@@ -184,16 +184,17 @@ def main():
             if create_assembly_docs(xml_file):
                 success_count += 1
     
-    # If any files have low quality documentation, use enhanced fallback
+    # Fail if XML documentation quality is insufficient
     if low_quality_count > 0:
-        print(f"📝 XML documentation appears minimal for {low_quality_count} files, creating enhanced fallback documentation...")
-        os.system("python3 scripts/create-fallback-api.py")
-        return
+        print(f"❌ DEPLOYMENT BLOCKED: XML documentation is insufficient for {low_quality_count} files")
+        print("❌ API documentation quality below acceptable threshold (< 30% documented members)")
+        print("❌ Fix source code XML documentation or .NET build process before deploying")
+        sys.exit(1)
     
     if success_count == 0:
-        print("❌ No XML files processed successfully, creating enhanced fallback documentation...")
-        os.system("python3 scripts/create-fallback-api.py")
-        return
+        print("❌ DEPLOYMENT BLOCKED: No XML files processed successfully")
+        print("❌ .NET build or XML generation failed completely")
+        sys.exit(1)
         
     print(f"Successfully processed {success_count}/{len(xml_files)} XML files")
     

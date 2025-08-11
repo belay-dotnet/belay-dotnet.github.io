@@ -78,7 +78,7 @@ jobs:
         run: |
           echo "Generating API documentation from XML files..."
           mkdir -p api/generated
-          python3 scripts/generate-api-simple.py || echo "⚠️  API generation failed, using fallback"
+          python3 scripts/generate-api-simple.py
           
       - name: Build with VitePress
         run: npm run build
