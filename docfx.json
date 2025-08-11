@@ -4,12 +4,14 @@
       "src": [
         {
           "files": [
-            "belay-source/src/**/*.csproj"
+            "belay-source/src/Belay.Attributes/Belay.Attributes.csproj",
+            "belay-source/src/Belay.Core/Belay.Core.csproj",
+            "belay-source/src/Belay.Extensions/Belay.Extensions.csproj",
+            "belay-source/src/Belay.Sync/Belay.Sync.csproj"
           ],
           "exclude": [
             "**/bin/**",
-            "**/obj/**",
-            "**/tests/**"
+            "**/obj/**"
           ]
         }
       ],

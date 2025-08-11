@@ -50,29 +50,22 @@ jobs:
       - name: Build .NET projects for XML documentation
         run: |
           cd belay-source
-          echo "Building .NET projects to generate XML documentation..."
-          set +e  # Don't fail on build errors
+          echo "Building source projects only for XML documentation..."
           
-          # Try full build first
-          dotnet restore --verbosity quiet
-          dotnet build --configuration Release --verbosity quiet
-          BUILD_SUCCESS=$?
-          
-          if [ $BUILD_SUCCESS -ne 0 ]; then
-            echo "⚠️  Full build failed, attempting individual project builds..."
-            
-            # Try building individual source projects
-            cd src
-            for project in Belay.Attributes Belay.Core Belay.Extensions Belay.Sync; do
-              echo "Building $project..."
-              cd $project 2>/dev/null && dotnet build --configuration Release --verbosity quiet --no-restore || echo "❌ $project build failed"
-              cd ..
-            done
-          else
-            echo "✅ Full build succeeded"
-          fi
-          
-          set -e  # Re-enable fail on error
+          # Build each source project individually to avoid test dependencies
+          cd src
+          for project in Belay.Attributes Belay.Core Belay.Extensions Belay.Sync; do
+            echo "Building $project..."
+            cd $project
+            dotnet restore --verbosity quiet
+            dotnet build --configuration Release --verbosity quiet
+            if [ $? -ne 0 ]; then
+              echo "❌ $project build failed"
+              exit 1
+            fi
+            echo "✅ $project built successfully"
+            cd ..
+          done
         
       - name: Install DocFX and Pandoc
         run: |
