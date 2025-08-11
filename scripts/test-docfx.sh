@@ -21,7 +21,8 @@ fi
 # Build the .NET projects to generate XML
 echo "🔨 Building .NET projects to generate XML documentation..."
 cd belay-source
-dotnet build -c Release
+# Disable StyleCop analyzers during documentation builds to prevent blocking issues
+dotnet build -c Release -p:RunStyleCopAnalyzers=false -p:RunCodeAnalysis=false
 cd ..
 
 # Generate metadata
