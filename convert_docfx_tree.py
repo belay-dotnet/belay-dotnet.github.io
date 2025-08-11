@@ -23,8 +23,13 @@ def clean_markdown_content(content):
     content = re.sub(r'^\s*import\s+.*from.*["\'].*["\'];?\s*$', '', content, flags=re.MULTILINE)
     content = re.sub(r'^\s*export\s+.*$', '', content, flags=re.MULTILINE)
     
-    # Remove all problematic markdown links that cause VitePress import errors
+    # Remove all problematic markdown links and path references that cause VitePress import errors
     content = re.sub(r'\[([^\]]*)\]\([^)]*\)', r'\1', content)  # Convert all links to plain text
+    
+    # Remove any relative path references that VitePress might interpret as module imports
+    content = re.sub(r'\.\./\.\./index', '', content)  # Remove the specific problematic path
+    content = re.sub(r'\.\./[^\s]*', '', content)  # Remove any ../path references
+    content = re.sub(r'\./[^\s]*', '', content)  # Remove any ./path references
     
     # Clean up multiple consecutive empty lines
     content = re.sub(r'\n\s*\n\s*\n', '\n\n', content)
