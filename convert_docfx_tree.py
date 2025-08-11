@@ -7,10 +7,24 @@ from pathlib import Path
 
 def clean_markdown_content(content):
     """Clean up markitdown output for VitePress compatibility"""
-    # Remove problematic HTML links
+    # Remove .html extensions from links
     content = re.sub(r'\.html\)', ')', content)
-    # Convert remaining markdown links to plain text
+    
+    # Fix malformed HTML elements by removing unclosed tags
+    content = re.sub(r'<[^>]*$', '', content, flags=re.MULTILINE)  # Remove incomplete tags at end of lines
+    content = re.sub(r'<(?!/)[^>]*>', '', content)  # Remove opening tags (keep closing tags)
+    content = re.sub(r'</[^>]*>', '', content)  # Remove all closing tags
+    
+    # Clean up HTML entities and special characters
+    content = re.sub(r'&[a-zA-Z]+;', '', content)  # Remove HTML entities
+    content = re.sub(r'\\', '', content)  # Remove escape characters
+    
+    # Convert remaining problematic markdown links to plain text
     content = re.sub(r'\[([^\]]*)\]\([^)]*\)', r'\1', content)
+    
+    # Clean up multiple consecutive empty lines
+    content = re.sub(r'\n\s*\n\s*\n', '\n\n', content)
+    
     return content
 
 def convert_html_file(html_path, output_dir):
