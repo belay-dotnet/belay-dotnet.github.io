@@ -70,8 +70,8 @@ jobs:
       - name: Install DocFX and Pandoc
         run: |
           echo "Installing DocFX..."
-          wget https://github.com/dotnet/docfx/releases/latest/download/docfx-linux-x64.zip
-          unzip -q docfx-linux-x64.zip -d /tmp/docfx
+          wget https://github.com/dotnet/docfx/releases/download/v2.78.3/docfx-linux-x64-v2.78.3.zip
+          unzip -q docfx-linux-x64-v2.78.3.zip -d /tmp/docfx
           chmod +x /tmp/docfx/docfx
           echo "/tmp/docfx" >> $GITHUB_PATH
           
