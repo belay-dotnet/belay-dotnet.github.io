@@ -107,12 +107,16 @@ jobs:
               content = re.sub(r'<(?!/)[^>]*>', '', content)  # Remove opening tags (keep closing tags)
               content = re.sub(r'</[^>]*>', '', content)  # Remove all closing tags
               
-              # Clean up HTML entities and special characters
+              # Clean up HTML entities and special characters  
               content = re.sub(r'&[a-zA-Z]+;', '', content)  # Remove HTML entities
               content = re.sub(r'\\\\\\\\', '', content)  # Remove escape characters
               
-              # Convert remaining problematic markdown links to plain text
-              content = re.sub(r'\[([^\]]*)\]\([^)]*\)', r'\1', content)
+              # Remove JavaScript/TypeScript import statements that cause VitePress errors
+              content = re.sub(r'^\\s*import\\s+.*from.*[\"\\'].*[\"\\'];?\\s*$', '', content, flags=re.MULTILINE)
+              content = re.sub(r'^\\s*export\\s+.*$', '', content, flags=re.MULTILINE)
+              
+              # Remove all problematic markdown links that cause VitePress import errors
+              content = re.sub(r'\[([^\]]*)\]\([^)]*\)', r'\1', content)  # Convert all links to plain text
               
               # Clean up multiple consecutive empty lines
               content = re.sub(r'\n\s*\n\s*\n', '\n\n', content)
