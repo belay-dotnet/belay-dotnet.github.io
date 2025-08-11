@@ -44,10 +44,13 @@ def create_assembly_docs(xml_file):
                     'examples': []
                 }
                 
-                # Extract examples
+                # Extract examples (including nested XML content)
                 for example in member.findall('.//example'):
-                    if example.text:
-                        types[type_name]['examples'].append(clean_text(example.text))
+                    if example is not None:
+                        # Get all text content including nested tags
+                        example_content = ET.tostring(example, encoding='unicode', method='text')
+                        if example_content and len(example_content.strip()) > 10:
+                            types[type_name]['examples'].append(example_content.strip())
                         
             elif name.startswith('M:'):
                 # Method documentation
@@ -106,8 +109,16 @@ def create_assembly_docs(xml_file):
                 if type_name in methods:
                     f.write("### Methods\n\n")
                     for method in methods[type_name][:5]:  # Limit methods per type
-                        method_short = method['name'].split('.')[-1].split('(')[0]
-                        f.write(f"#### {method_short}\n\n")
+                        # Extract method signature with parameters
+                        full_name = method['name']
+                        if '(' in full_name:
+                            # Has parameters - show full signature 
+                            method_display = full_name.split('.')[-1]  # Get just the method part
+                        else:
+                            # No parameters - just method name
+                            method_display = full_name.split('.')[-1]
+                        
+                        f.write(f"#### {method_display}\n\n")
                         f.write(f"{method['summary']}\n\n")
                         
                         if method['parameters']:
@@ -130,8 +141,14 @@ def create_assembly_docs(xml_file):
                 # Add examples
                 if type_info['examples']:
                     f.write("### Examples\n\n")
-                    for example in type_info['examples'][:2]:  # Limit examples
-                        f.write(f"```csharp\n{example}\n```\n\n")
+                    for i, example in enumerate(type_info['examples'][:2]):  # Limit examples
+                        # Clean up the example text and format properly
+                        clean_example = example.replace('&lt;', '<').replace('&gt;', '>')
+                        # Look for code sections
+                        if 'public class' in clean_example or '[Task' in clean_example:
+                            f.write(f"**Example {i+1}:**\n\n```csharp\n{clean_example}\n```\n\n")
+                        else:
+                            f.write(f"**Example {i+1}:**\n\n{clean_example}\n\n")
                 
                 f.write("---\n\n")
         
