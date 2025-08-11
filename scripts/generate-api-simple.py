@@ -134,6 +134,9 @@ def create_assembly_docs(xml_file):
                             # Clean up generic markers and combine with parameters  
                             clean_method_name = method_name_part.replace('``1', '<T>').replace('``2', '<T,U>')
                             method_display = clean_method_name + after_paren
+                            
+                            # Escape problematic characters for VitePress/Vue
+                            method_display = method_display.replace('{', '\\{').replace('}', '\\}')
                         else:
                             # No parameters - just method name
                             method_display = full_name.split('.')[-1]
