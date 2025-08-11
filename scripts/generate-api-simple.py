@@ -137,6 +137,7 @@ def create_assembly_docs(xml_file):
                             
                             # Escape problematic characters for VitePress/Vue
                             method_display = method_display.replace('{', '\\{').replace('}', '\\}')
+                            method_display = method_display.replace('<', '\\<').replace('>', '\\>')
                         else:
                             # No parameters - just method name
                             method_display = full_name.split('.')[-1]
