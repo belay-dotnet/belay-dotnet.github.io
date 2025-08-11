@@ -15,13 +15,14 @@
           ]
         }
       ],
-      "dest": "api/metadata",
+      "dest": "api/generated",
       "includePrivateMembers": false,
       "disableGitFeatures": false,
       "disableDefaultFilter": false,
       "noRestore": false,
-      "namespaceLayout": "flattened",
-      "memberLayout": "samePage",
+      "outputFormat": "markdown",
+      "namespaceLayout": "nested",
+      "memberLayout": "separatePages",
       "allowCompilationErrors": true,
       "properties": {
         "TargetFramework": "net8.0",
@@ -36,41 +37,4 @@
       }
     }
   ],
-  "build": {
-    "content": [
-      {
-        "files": [
-          "api/metadata/*.yml",
-          "api/metadata/**/*.yml"
-        ]
-      }
-    ],
-    "resource": [
-      {
-        "files": [
-          "images/**"
-        ]
-      }
-    ],
-    "output": "api/generated",
-    "template": [
-      "default",
-      "modern"
-    ],
-    "postProcessors": ["ExtractSearchIndex"],
-    "markdownEngineName": "markdig",
-    "noLangKeyword": false,
-    "keepFileLink": false,
-    "cleanupCacheHistory": false,
-    "disableGitFeatures": false,
-    "globalMetadata": {
-      "_appTitle": "Belay.NET API Reference",
-      "_appName": "Belay.NET",
-      "_enableSearch": true,
-      "_gitContribute": {
-        "repo": "https://github.com/belay-dotnet/Belay.NET",
-        "branch": "main"
-      }
-    }
-  }
 }

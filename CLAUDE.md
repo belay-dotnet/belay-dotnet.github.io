@@ -27,7 +27,6 @@ This script:
 The local build script will install most dependencies, but you may need:
 
 - **Node.js 18+**: For VitePress
-- **Python 3**: For markitdown HTML conversion
 - **.NET 8 SDK**: For building source projects
 - **DocFX**: Downloaded automatically by the script
 
@@ -40,8 +39,6 @@ unzip -q docfx-linux-x64-v2.78.3.zip -d /tmp/docfx
 chmod +x /tmp/docfx/docfx
 export PATH=/tmp/docfx:$PATH
 
-# Install markitdown for HTML to Markdown conversion
-pip install markitdown
 
 # Install Node.js dependencies
 npm ci
@@ -52,27 +49,20 @@ npm ci
 The documentation website includes auto-generated API documentation through this pipeline:
 
 1. **Source Build**: Build Belay.NET projects to generate XML documentation
-2. **DocFX Generation**: Create HTML API documentation from XML comments
-3. **Markdown Conversion**: Convert DocFX HTML to VitePress-compatible markdown
-4. **VitePress Build**: Generate the final static website
+2. **DocFX Native Markdown**: Generate markdown directly from XML comments using DocFX `--outputFormat markdown`
+3. **VitePress Build**: Generate the final static website
 
 ### Key Files
 
 - `docfx.json`: DocFX configuration for API documentation generation
-- `convert_docfx_tree.py`: Python script to convert DocFX HTML to markdown using markitdown
 - `.github/workflows/deploy.yml`: CI/CD pipeline that builds and deploys the website
 
 ### Common Issues
 
-#### VitePress HTML Parsing Errors
-**Symptom**: CI fails with "Element is missing end tag" errors
-**Cause**: Malformed HTML in converted markdown files
-**Fix**: Improve the `clean_markdown_content()` function in `convert_docfx_tree.py`
-
 #### Missing API Documentation
 **Symptom**: API pages show minimal content
-**Cause**: Only converting namespace summaries instead of full DocFX tree
-**Fix**: Ensure conversion script processes all HTML files in `api/generated/api/metadata/`
+**Cause**: DocFX configuration issues with native markdown output
+**Fix**: Ensure `outputFormat: "markdown"`, `memberLayout: "separatePages"` in `docfx.json`
 
 #### Build Artifacts in Git
 **Symptom**: Large commits with generated files
@@ -88,15 +78,15 @@ The documentation website includes auto-generated API documentation through this
 ### Development Workflow
 
 ```bash
-# 1. Make changes to conversion script or CI configuration
-vim convert_docfx_tree.py
+# 1. Make changes to DocFX configuration
+vim docfx.json
 
 # 2. Test locally BEFORE committing
 ./scripts/local-build.sh
 
 # 3. If build succeeds, commit and push
 git add .
-git commit -m "Fix API documentation conversion"
+git commit -m "Update API documentation generation"
 git push
 
 # 4. Monitor CI for successful deployment

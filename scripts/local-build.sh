@@ -14,10 +14,7 @@ if ! command -v docfx &> /dev/null; then
     exit 1
 fi
 
-if ! command -v python3 -m markitdown &> /dev/null; then
-    echo "❌ markitdown not found. Installing..."
-    pip install markitdown
-fi
+# No longer need markitdown for native DocFX markdown output
 
 # Clean previous builds
 echo "🧹 Cleaning previous builds..."
@@ -50,14 +47,12 @@ for project in Belay.Attributes Belay.Core Belay.Extensions Belay.Sync; do
 done
 cd ../../docs
 
-# Generate DocFX documentation
-echo "📖 Generating DocFX documentation..."
+# Generate DocFX documentation with native markdown output
+echo "📖 Generating DocFX documentation with native markdown..."
 docfx metadata docfx.json
-docfx build docfx.json
 
-# Run our conversion script
-echo "🔄 Converting DocFX to VitePress markdown..."
-python3 convert_docfx_tree.py
+echo "📁 Generated markdown files:"
+find api/generated -name "*.md" | head -10
 
 # Test VitePress build
 echo "🏗️  Testing VitePress build..."
