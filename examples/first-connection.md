@@ -38,13 +38,19 @@ Replace the contents of `Program.cs` with:
 
 ```csharp
 using Belay.Core;
+using Microsoft.Extensions.Logging.Abstractions;
 using System;
 
 try
 {
     // Connect to your MicroPython device
-    using var device = await Device.ConnectAsync("COM3"); // Change to your port
+    var logger = NullLogger<DeviceConnection>.Instance;
+    using var device = new DeviceConnection(
+        DeviceConnection.ConnectionType.Serial,
+        "COM3", // Change to your port
+        logger);
     
+    await device.ConnectAsync();
     Console.WriteLine("Connected to MicroPython device!");
     
     // Test basic communication

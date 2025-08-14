@@ -22,17 +22,22 @@ rm -rf api/generated
 rm -rf .vitepress/dist
 rm -rf .vitepress/cache
 
-# Check if belay-source exists
-if [ ! -d "../belay-source" ]; then
-    echo "🔄 Cloning Belay.NET source repository..."
-    cd ..
-    git clone --depth 1 https://github.com/belay-dotnet/Belay.NET.git belay-source
-    cd docs
+# Set up belay-source symlink for local development
+if [ ! -d "belay-source" ]; then
+    echo "🔗 Creating belay-source symlink for local development..."
+    ln -sf ../ belay-source
+fi
+
+# Verify belay-source structure exists
+if [ ! -d "belay-source/src" ]; then
+    echo "❌ belay-source/src directory not found."
+    echo "Expected structure: belay-source/src/Belay.Core/, etc."
+    exit 1
 fi
 
 # Build .NET projects for XML documentation only (disable StyleCop)
 echo "🔨 Building .NET projects for XML documentation..."
-cd ../belay-source/src
+cd belay-source/src
 for project in Belay.Attributes Belay.Core Belay.Extensions Belay.Sync; do
     echo "  Building $project..."
     cd $project
@@ -50,7 +55,7 @@ for project in Belay.Attributes Belay.Core Belay.Extensions Belay.Sync; do
     echo "✅ $project built successfully"
     cd ..
 done
-cd ../../docs
+cd ../../
 
 # Generate DocFX documentation with native markdown output
 echo "📖 Generating DocFX documentation with native markdown..."

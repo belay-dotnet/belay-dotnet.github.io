@@ -2,11 +2,23 @@
 
 Belay.NET uses the **Raw REPL Protocol** to communicate with MicroPython devices. This protocol provides programmatic access to the Python interpreter running on your microcontroller, enabling seamless code execution and data exchange.
 
-## Understanding Raw REPL
+## Understanding Raw REPL Protocol
 
 ### What is Raw REPL?
 
 Raw REPL (Read-Eval-Print Loop) is a binary protocol that allows programmatic control of a MicroPython interpreter. Unlike the interactive REPL you see in a terminal, Raw REPL is designed for automated communication between applications and devices.
+
+Belay.NET implements an **Adaptive Raw REPL Protocol** that automatically detects device capabilities and optimizes communication accordingly.
+
+### Sophisticated Protocol Features
+
+Belay.NET's sophisticated protocol implementation includes:
+
+- **Raw-Paste Mode Support**: Efficient handling of large code transfers with `\x05A\x01` initialization
+- **Flow Control Handling**: Dynamic window size negotiation and `\x01` acknowledgment protocol
+- **Large Transfer Chunking**: Automatic code splitting based on device window capabilities
+- **Adaptive Protocol Selection**: Automatic fallback between basic Raw REPL and Raw-Paste mode
+- **Device-Specific Timeouts**: Performance profiling and adaptive timeout calculations
 
 ### Protocol Flow
 
@@ -38,16 +50,17 @@ The primary connection method for most development boards:
 
 ```csharp
 // Basic serial connection
-using var device = await Device.ConnectAsync("COM3");
+using var logger = Microsoft.Extensions.Logging.Abstractions.NullLogger<DeviceConnection>.Instance;
+var connection = new DeviceConnection(
+    DeviceConnection.ConnectionType.Serial,
+    "COM3",  // Change to your port (Linux: /dev/ttyACM0, /dev/ttyUSB0)
+    logger);
 
-// With custom settings
-var connection = new SerialConnection("COM3") {
-    BaudRate = 115200,
-    ReadTimeoutMs = 5000,
-    WriteTimeoutMs = 2000
-};
-using var device = new Device(connection);
-await device.ConnectAsync();
+await connection.ConnectAsync();
+
+// Execute Python code on the device
+var result = await connection.ExecuteAsync("print('Hello from MicroPython!')");
+Console.WriteLine(result); // Output: Hello from MicroPython!
 ```
 
 **Supported Parameters:**

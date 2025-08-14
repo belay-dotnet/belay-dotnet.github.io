@@ -1,8 +1,9 @@
 # ICD-001: Raw REPL Protocol Specification
 
-**Version**: 1.0  
+**Version**: 2.0  
 **Date**: 2025-01-13  
 **Status**: Active  
+**Updated**: 2025-08-14 - Added sophisticated protocol features  
 
 ## Overview
 
@@ -48,17 +49,34 @@ This document specifies the Raw REPL (Read-Eval-Print Loop) protocol for MicroPy
 6. Send: 0x02 (EXIT_RAW)
 ```
 
-### Raw-Paste Mode (for large transfers)
+### Sophisticated Raw-Paste Mode (AdaptiveRawReplProtocol)
+
+For large code transfers and enhanced performance, Belay.NET implements Raw-Paste mode:
+
 ```
-1. Send: 0x01 (ENTER_RAW)
-2. Wait for: ">"
-3. Send: 0x05, 0x01 (RAW_PASTE)
-4. Wait for: window_size (2 bytes)
-5. Send: data in chunks based on window size
-6. Handle flow control bytes (0x01 = ready for more)
-7. Send: 0x04 (EXECUTE)
-8. Read: execution_result
+1. Send: 0x05, 'A', 0x01 (RAW_PASTE initialization)
+2. Wait for: Window size response
+3. Send: Code in chunks based on window size  
+4. Handle: Flow control bytes (0x01 for continue)
+5. Send: 0x04 (End of data)
+6. Read: Execution results with flow control
+7. Send: 0x02 (EXIT_RAW)
 ```
+
+#### Flow Control Protocol
+
+- **Window Size Negotiation**: Device advertises maximum buffer size
+- **Acknowledgment Protocol**: Device sends 0x01 when ready for more data
+- **Dynamic Chunking**: Code automatically split based on device capabilities
+- **Adaptive Fallback**: Automatic switch to basic Raw REPL if paste mode fails
+
+#### Device Capability Detection
+
+The adaptive protocol automatically detects:
+- Raw-Paste mode support
+- Optimal window sizes (typically 32-512 bytes)
+- Device-specific timing requirements
+- Flow control reliability
 
 ## Response Patterns
 
