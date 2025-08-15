@@ -65,7 +65,7 @@ var temp = await controller.ReadTemperatureAsync(26); // Read from ADC pin
 This section covers additional patterns for extending Belay.NET's functionality:
 
 - **Custom Attribute Creation**: Extending the base attribute classes
-- **Executor Integration**: Creating custom executors for specialized behavior
+- **Direct Execution Integration**: Using attributes with direct Python execution
 - **Policy Implementation**: Implementing custom retry, timeout, and caching policies
 - **Method Interception**: Advanced method interception patterns
 - **Performance Optimization**: Custom attributes for performance-critical scenarios
@@ -73,10 +73,10 @@ This section covers additional patterns for extending Belay.NET's functionality:
 - **Validation Attributes**: Input validation and parameter checking
 - **Logging Attributes**: Custom logging and telemetry collection
 
-## Quick Preview
+## Custom Attribute Implementation
 
 ```csharp
-// Example of what's coming - custom caching attribute
+// Example custom caching attribute
 [AttributeUsage(AttributeTargets.Method)]
 public class CacheResultAttribute : TaskAttribute
 {
@@ -89,64 +89,39 @@ public class CacheResultAttribute : TaskAttribute
     }
 }
 
-// Custom executor for cached operations
-public class CachedTaskExecutor : TaskExecutor
+// Usage with simplified Device API
+public interface ISensorInterface
 {
-    private readonly IMemoryCache _cache;
-    
-    public CachedTaskExecutor(Device device, IDeviceSessionManager sessionManager, 
-        IMemoryCache cache, ILogger<CachedTaskExecutor> logger)
-        : base(device, sessionManager, logger)
-    {
-        _cache = cache;
-    }
-    
-    protected override async Task<T> ExecuteWithPoliciesAsync<T>(
-        string code, MethodInfo method, CancellationToken cancellationToken)
-    {
-        var cacheAttr = method.GetCustomAttribute<CacheResultAttribute>();
-        if (cacheAttr != null)
-        {
-            var cacheKey = cacheAttr.CacheKey ?? $"{method.Name}_{code.GetHashCode()}";
-            
-            if (_cache.TryGetValue(cacheKey, out T cachedResult))
-            {
-                return cachedResult;
-            }
-            
-            var result = await base.ExecuteWithPoliciesAsync<T>(code, method, cancellationToken);
-            
-            var cacheOptions = new MemoryCacheEntryOptions
-            {
-                AbsoluteExpirationRelativeToNow = TimeSpan.FromMilliseconds(cacheAttr.CacheDurationMs)
-            };
-            
-            _cache.Set(cacheKey, result, cacheOptions);
-            return result;
-        }
+    [Task]
+    [CacheResult(CacheDurationMs = 60000, CacheKey = "device_info")]
+    [PythonCode("sys.version")]
+    Task<string> GetDeviceInfoAsync();
         
-        return await base.ExecuteWithPoliciesAsync<T>(code, method, cancellationToken);
-    }
+    [Task]
+    [CacheResult(10000)] // Cache for 10 seconds
+    [PythonCode(@"
+        import machine
+        sensor = machine.ADC(machine.Pin(26))
+        reading = sensor.read_u16()
+        temperature = (reading * 3.3 / 65535) * 100
+        temperature
+    ")]
+    Task<float> ReadTemperatureAsync();
 }
 
-// Usage example
-public class SensorDevice : Device
-{
-    [CacheResult(CacheDurationMs = 60000, CacheKey = "device_info")]
-    public async Task<string> GetDeviceInfoAsync() =>
-        await ExecuteAsync<string>("sys.version");
-        
-    [CacheResult(10000)] // Cache for 10 seconds
-    public async Task<float> ReadTemperatureAsync() =>
-        await ExecuteAsync<float>("sensor.read_temp()");
-}
+// Direct usage with Device
+using var device = Device.FromConnectionString("serial:COM3");
+await device.ConnectAsync();
+
+var sensor = device.CreateProxy<ISensorInterface>();
+var temp = await sensor.ReadTemperatureAsync(); // Cached result
 ```
 
 ## Related Documentation
 
 - [Attribute Programming](/guide/attributes) - Core attribute system concepts
-- [Session Management](/guide/session-management) - Executor framework integration
 - [Configuration](/guide/configuration) - Custom attribute configuration
-- [Testing](/guide/testing) - Testing custom attributes and executors
+- [Testing](/guide/testing) - Testing custom attributes
+- [Device Programming](/articles/device-programming) - Direct device execution patterns
 
 **Need help now?** Check our [GitHub Discussions](https://github.com/belay-dotnet/Belay.NET/discussions) or review the [attribute programming guide](/guide/attributes).
