@@ -23,6 +23,13 @@ jobs:
         with:
           fetch-depth: 0
           
+      - name: Remove belay-source symlink (if exists)
+        run: |
+          if [ -L "belay-source" ]; then
+            echo "Removing belay-source symlink for CI"
+            rm belay-source
+          fi
+          
       - name: Checkout main Belay.NET repository
         uses: actions/checkout@v4
         with:
