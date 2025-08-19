@@ -25,13 +25,9 @@ cd belay-source
 dotnet build Belay.NET.sln -c Release -p:RunStyleCopAnalyzers=false -p:RunCodeAnalysis=false
 cd ..
 
-# Generate metadata
-echo "📊 Generating metadata with DocFX..."
+# Generate metadata (directly outputs markdown when outputFormat: "markdown")
+echo "📊 Generating API documentation with DocFX..."
 docfx metadata docfx.json
-
-# Build documentation
-echo "📄 Building documentation with DocFX..."
-docfx build docfx.json
 
 # Check output
 if [ -d "api/generated" ]; then
